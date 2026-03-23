@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base Colors -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Tilt Arena Theme Colors -->
+    <color name="color_background">#0A0A0F</color>
+    <color name="color_surface">#1A1A2E</color>
+    <color name="color_surface_elevated">#2A2A3E</color>
+
+    <color name="color_primary">#00F5FF</color>      <!-- Cyan Neon -->
+    <color name="color_primary_variant">#00B2BA</color>
+    <color name="color_secondary">#FF6B00</color>    <!-- Orange Neon -->
+    <color name="color_tertiary">#7B2FFF</color>     <!-- Purple Neon -->
+    <color name="color_accent">#7B2FFF</color>
+
+    <color name="color_text_primary">#FFFFFF</color>
+    <color name="color_text_secondary">#E0E0E0</color>
+    <color name="color_text_hint">#808080</color>
+
+    <color name="color_divider">#33FFFFFF</color>
+    <color name="color_overlay">#80000000</color>
+    <color name="color_error">#FF3D00</color>
+
+    <!-- Difficulty Colors -->
+    <color name="color_diff_easy">#00FF88</color>
+    <color name="color_diff_normal">#FFD700</color>
+    <color name="color_diff_hard">#FF3D00</color>
+
+    <!-- Neon Glow Helpers -->
+    <color name="color_primary_glow">#4D00F5FF</color>
+    <color name="color_secondary_glow">#4DFF6B00</color>
+</resources>

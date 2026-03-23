@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    STEP 3 – MATCH SETTINGS
+    • Player count selector (VS PLAYER mode)
+    • AI Difficulty (VS AI mode)
+    • Time limit radio group
+    • START GAME button
+-->
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/color_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/padding_screen">
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/match_setup_title"
+            android:textSize="22sp"
+            android:textColor="@color/color_primary"
+            android:textStyle="bold"
+            android:fontFamily="@font/orbitron"
+            android:letterSpacing="0.1"
+            android:layout_marginBottom="20dp" />
+
+        <!-- ── PLAYER COUNT (visible for VS PLAYER mode) ── -->
+        <LinearLayout
+            android:id="@+id/sectionPlayerCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_players"
+                android:textSize="13sp"
+                android:textColor="@color/color_text_secondary"
+                android:fontFamily="@font/rajdhani"
+                android:letterSpacing="0.2"
+                android:textAllCaps="true"
+                android:layout_marginBottom="10dp" />
+
+            <!-- 2 / 3 / 4 player toggle buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn2Players"
+                    style="@style/ButtonStyle.Neon.Large"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="2"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btn3Players"
+                    style="@style/ButtonStyle.Neon"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="3"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btn4Players"
+                    style="@style/ButtonStyle.Neon"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="4" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ── AI DIFFICULTY (visible for VS AI mode) ── -->
+        <LinearLayout
+            android:id="@+id/sectionAiDifficulty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_ai_difficulty"
+                android:textSize="13sp"
+                android:textColor="@color/color_text_secondary"
+                android:fontFamily="@font/rajdhani"
+                android:letterSpacing="0.2"
+                android:textAllCaps="true"
+                android:layout_marginBottom="10dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnAiEasy"
+                    style="@style/ButtonStyle.Neon.Large"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="@string/ai_easy"
+                    android:textColor="@color/color_diff_easy"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnAiNormal"
+                    style="@style/ButtonStyle.Neon"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="@string/ai_normal"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnAiHard"
+                    style="@style/ButtonStyle.Neon"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="@string/ai_hard"
+                    android:textColor="@color/color_diff_hard" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ── TIME LIMIT ── -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_time_limit"
+            android:textSize="13sp"
+            android:textColor="@color/color_text_secondary"
+            android:fontFamily="@font/rajdhani"
+            android:letterSpacing="0.2"
+            android:textAllCaps="true"
+            android:layout_marginBottom="10dp" />
+
+        <RadioGroup
+            android:id="@+id/rgTimeLimit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="24dp">
+
+            <RadioButton
+                android:id="@+id/rb1Min"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/time_1min"
+                android:textColor="@color/color_text_primary"
+                android:buttonTint="@color/color_primary"
+                android:fontFamily="@font/rajdhani"
+                android:textSize="13sp" />
+
+            <RadioButton
+                android:id="@+id/rb3Min"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/time_3min"
+                android:textColor="@color/color_text_primary"
+                android:buttonTint="@color/color_primary"
+                android:fontFamily="@font/rajdhani"
+                android:textSize="13sp"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/rb5Min"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/time_5min"
+                android:textColor="@color/color_text_primary"
+                android:buttonTint="@color/color_primary"
+                android:fontFamily="@font/rajdhani"
+                android:textSize="13sp" />
+
+            <RadioButton
+                android:id="@+id/rbNoLimit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/time_unlimited"
+                android:textColor="@color/color_text_primary"
+                android:buttonTint="@color/color_primary"
+                android:fontFamily="@font/rajdhani"
+                android:textSize="13sp" />
+
+        </RadioGroup>
+
+        <!-- Spacer -->
+        <View android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+
+        <!-- ── START GAME CTA button ── -->
+        <Button
+            android:id="@+id/btnStartGame"
+            style="@style/ButtonStyle.Neon.Large"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_lg"
+            android:text="@string/btn_start_game"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+</ScrollView>

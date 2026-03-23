@@ -1,0 +1,54 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme -->
+    <style name="Theme.TiltArena" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorSecondary">@color/color_secondary</item>
+        <item name="android:windowBackground">@color/color_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <!-- Button Style Neon Cyan -->
+    <style name="ButtonStyle.Neon" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/button_height</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/color_primary</item>
+        <item name="android:textSize">@dimen/text_size_body</item>
+        <item name="android:fontFamily">@font/rajdhani</item>
+        <item name="android:letterSpacing">0.1</item>
+        <item name="strokeColor">@color/color_primary</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="cornerRadius">@dimen/button_corner_radius</item>
+        <item name="rippleColor">@color/color_primary_glow</item>
+    </style>
+
+    <!-- Large Button Style -->
+    <style name="ButtonStyle.Neon.Large" parent="ButtonStyle.Neon">
+        <item name="android:layout_height">@dimen/button_height_lg</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Button Style Neon Orange -->
+    <style name="ButtonStyle.Neon.Orange" parent="ButtonStyle.Neon">
+        <item name="android:textColor">@color/color_secondary</item>
+        <item name="strokeColor">@color/color_secondary</item>
+        <item name="rippleColor">@color/color_secondary_glow</item>
+    </style>
+
+    <!-- Text Styles -->
+    <style name="TextStyle.Title" parent="android:Widget.TextView">
+        <item name="android:textSize">@dimen/text_size_title</item>
+        <item name="android:textColor">@color/color_primary</item>
+        <item name="android:fontFamily">@font/orbitron</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextStyle.Body" parent="android:Widget.TextView">
+        <item name="android:textSize">@dimen/text_size_body</item>
+        <item name="android:textColor">@color/color_text_secondary</item>
+        <item name="android:fontFamily">@font/rajdhani</item>
+    </style>
+</resources>

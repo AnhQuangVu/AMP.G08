@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <!-- Game Render Surface -->
+    <com.example.ampg08.view.GameView
+        android:id="@+id/gameView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Top Status Bar -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:background="#80000000"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvScoreP1"
+            style="@style/TextStyle.Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/score_p1_format"
+            android:textColor="@color/color_primary"
+            android:textStyle="bold"
+            tools:text="P1: 000" />
+
+        <TextView
+            android:id="@+id/tvTimer"
+            style="@style/TextStyle.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/timer_default"
+            android:textSize="24sp"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/tvScoreP2"
+            style="@style/TextStyle.Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/score_p2_format"
+            android:gravity="end"
+            android:textColor="@color/color_secondary"
+            android:textStyle="bold"
+            tools:text="000 :P2" />
+    </LinearLayout>
+
+    <!-- Pause Button -->
+    <ImageButton
+        android:id="@+id/btnPause"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@android:drawable/ic_media_pause"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_margin="16dp"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="@color/white"
+        android:contentDescription="@string/pause_desc" />
+
+    <!-- Tilt Indicator (Visual help) -->
+    <ImageView
+        android:id="@+id/tiltIndicator"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@android:drawable/ic_menu_compass"
+        android:alpha="0.2"
+        android:layout_margin="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tint="@color/color_primary"
+        android:contentDescription="@string/tilt_desc" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

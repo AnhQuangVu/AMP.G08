@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_background">
+
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_back"
+        android:layout_margin="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tint="@color/color_primary" />
+
+    <TextView
+        android:id="@+id/tvSettingsTitle"
+        style="@style/TextStyle.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SYSTEM SETTINGS"
+        android:textSize="24sp"
+        app:layout_constraintTop_toTopOf="@id/btnBack"
+        app:layout_constraintBottom_toBottomOf="@id/btnBack"
+        app:layout_constraintStart_toEndOf="@id/btnBack"
+        android:layout_marginStart="8dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="24dp"
+        app:layout_constraintTop_toBottomOf="@id/btnBack"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Control Sensitivity -->
+            <TextView
+                style="@style/TextStyle.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SENSOR SENSITIVITY"
+                android:textColor="@color/color_primary" />
+
+            <SeekBar
+                android:id="@+id/sbSensitivity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:max="10"
+                android:progress="5"
+                android:progressTint="@color/color_primary"
+                android:thumbTint="@color/color_primary" />
+
+            <!-- Audio -->
+            <TextView
+                style="@style/TextStyle.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AUDIO &amp; HAPTICS"
+                android:textColor="@color/color_primary"
+                android:layout_marginTop="32dp" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/swMusic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="MUSIC"
+                android:textColor="@color/white"
+                android:fontFamily="@font/rajdhani"
+                android:layout_marginTop="16dp"
+                app:thumbTint="@color/color_primary"
+                app:trackTint="@color/color_primary_glow" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/swSFX"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="SOUND EFFECTS"
+                android:textColor="@color/white"
+                android:fontFamily="@font/rajdhani"
+                app:thumbTint="@color/color_primary"
+                app:trackTint="@color/color_primary_glow" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/swVibration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="VIBRATION"
+                android:textColor="@color/white"
+                android:fontFamily="@font/rajdhani"
+                app:thumbTint="@color/color_primary"
+                app:trackTint="@color/color_primary_glow" />
+
+            <!-- Reset -->
+            <Button
+                android:id="@+id/btnReset"
+                style="@style/ButtonStyle.Neon.Orange"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="RESET PROGRESS"
+                android:layout_marginTop="48dp"
+                app:strokeColor="@color/color_error"
+                android:textColor="@color/color_error" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

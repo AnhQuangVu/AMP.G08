@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ╔══════════════════════════════════╗
+    ║   MAIN MENU – activity_main
+    ║   Animated particle background
+    ║   Logo + 4 neon menu buttons
+    ╚══════════════════════════════════╝
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_background"
+    tools:context=".MainActivity">
+
+    <!-- ── Animated Particle / Grid Background ── -->
+    <com.example.ampg08.view.ParticleView
+        android:id="@+id/particleView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ── LOGO (top center) ── -->
+    <LinearLayout
+        android:id="@+id/logoContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="60dp">
+
+        <TextView
+            android:id="@+id/tvLogoTilt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_tilt"
+            android:textSize="40sp"
+            android:textColor="@color/color_primary"
+            android:textStyle="bold"
+            android:fontFamily="@font/orbitron"
+            android:letterSpacing="0.25"
+            tools:text="TILT" />
+
+        <TextView
+            android:id="@+id/tvLogoArena"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_arena"
+            android:textSize="40sp"
+            android:textColor="@color/color_secondary"
+            android:textStyle="bold"
+            android:fontFamily="@font/orbitron"
+            android:letterSpacing="0.3"
+            android:layout_marginTop="-4dp"
+            tools:text="ARENA" />
+
+    </LinearLayout>
+
+    <!-- ── Decorative line under logo ── -->
+    <View
+        android:id="@+id/logoDivider"
+        android:layout_width="200dp"
+        android:layout_height="1dp"
+        android:background="@color/color_primary"
+        android:alpha="0.3"
+        app:layout_constraintTop_toBottomOf="@id/logoContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp" />
+
+    <!-- ── MENU BUTTONS ── -->
+    <LinearLayout
+        android:id="@+id/menuButtons"
+        android:layout_width="@dimen/main_button_width"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/logoDivider"
+        app:layout_constraintBottom_toTopOf="@id/versionText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp">
+
+        <!-- PLAY button -->
+        <Button
+            android:id="@+id/btnPlay"
+            style="@style/ButtonStyle.Neon"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:text="@string/menu_play"
+            android:drawableStart="@drawable/ic_play"
+            android:drawablePadding="12dp"
+            android:layout_marginBottom="14dp"
+            android:alpha="0"
+            android:translationX="80dp" />
+
+        <!-- SCORE button -->
+        <Button
+            android:id="@+id/btnScore"
+            style="@style/ButtonStyle.Neon"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:text="@string/menu_score"
+            android:drawableStart="@drawable/ic_score"
+            android:drawablePadding="12dp"
+            android:layout_marginBottom="14dp"
+            android:alpha="0"
+            android:translationX="80dp" />
+
+        <!-- SETTINGS button -->
+        <Button
+            android:id="@+id/btnSettings"
+            style="@style/ButtonStyle.Neon"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:text="@string/menu_settings"
+            android:drawableStart="@drawable/ic_settings"
+            android:drawablePadding="12dp"
+            android:layout_marginBottom="14dp"
+            android:alpha="0"
+            android:translationX="80dp" />
+
+        <!-- LOGIN / PROFILE button (orange) -->
+        <Button
+            android:id="@+id/btnProfile"
+            style="@style/ButtonStyle.Neon.Orange"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:text="@string/menu_login"
+            android:drawableStart="@drawable/ic_profile"
+            android:drawablePadding="12dp"
+            android:alpha="0"
+            android:translationX="80dp" />
+
+    </LinearLayout>
+
+    <!-- ── Version text (bottom-right) ── -->
+    <TextView
+        android:id="@+id/versionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/version_text"
+        android:textSize="10sp"
+        android:textColor="@color/color_text_hint"
+        android:fontFamily="@font/rajdhani"
+        android:alpha="0.5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="20dp"
+        tools:text="v1.0.0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

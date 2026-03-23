@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- RecyclerView item: map thumbnail card -->
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardMap"
+    android:layout_width="@dimen/map_card_width"
+    android:layout_height="@dimen/map_card_height"
+    android:layout_marginEnd="12dp"
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="@color/color_surface"
+    app:cardCornerRadius="@dimen/map_card_corner"
+    app:cardElevation="4dp"
+    app:strokeColor="@color/color_divider"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Map colour placeholder (represents thumbnail) -->
+        <View
+            android:id="@+id/mapThumbnail"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/color_surface_elevated"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/mapInfoBar" />
+
+        <!-- Map name + stars bar at bottom -->
+        <LinearLayout
+            android:id="@+id/mapInfoBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="@color/color_surface"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:id="@+id/tvMapName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="@color/color_text_primary"
+                android:textStyle="bold"
+                android:fontFamily="@font/rajdhani"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- Star row -->
+            <LinearLayout
+                android:id="@+id/mapStarsRow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="2dp" />
+
+        </LinearLayout>
+
+        <!-- Lock overlay (GONE when unlocked) -->
+        <FrameLayout
+            android:id="@+id/lockOverlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/color_overlay"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:layout_width="@dimen/icon_md"
+                android:layout_height="@dimen/icon_md"
+                android:src="@drawable/ic_lock"
+                android:layout_gravity="center"
+                android:contentDescription="@string/map_locked" />
+
+        </FrameLayout>
+
+        <!-- Selected highlight ring -->
+        <View
+            android:id="@+id/selectedRing"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_neon_button"
+            android:visibility="gone"
+            android:alpha="0.3"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

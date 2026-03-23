@@ -1,0 +1,87 @@
+<resources>
+    <string name="app_name">Tilt Arena</string>
+
+    <!-- Titles -->
+    <string name="title_tilt">TILT</string>
+    <string name="title_arena">ARENA</string>
+
+    <!-- Menu -->
+    <string name="menu_play">PLAY</string>
+    <string name="menu_score">SCORE</string>
+    <string name="menu_settings">SETTINGS</string>
+    <string name="menu_login">LOGIN</string>
+    <string name="menu_profile">PROFILE</string>
+    <string name="version_text">v1.0.0-ALPHA</string>
+
+    <!-- Splash -->
+    <string name="loading_assets">LOADING ASSETS&#8230;</string>
+
+    <!-- Login -->
+    <string name="login_title">ACCESS GRANTED</string>
+    <string name="username_hint">PILOT NAME</string>
+    <string name="password_hint">ACCESS CODE</string>
+    <string name="btn_login">AUTHENTICATE</string>
+    <string name="btn_register">NEW PILOT</string>
+    <string name="btn_guest">GUEST MODE</string>
+    <string name="btn_google">GOOGLE SIGN-IN</string>
+    <string name="label_or">OR</string>
+
+    <!-- Play Setup & Fragments -->
+    <string name="setup_title">MISSION BRIEFING</string>
+    <string name="mode_select_title">SELECT MODE</string>
+    <string name="map_select_title">SELECT ARENA</string>
+    <string name="match_setup_title">MATCH CONFIG</string>
+
+    <string name="step_mode">1. SELECT MODE</string>
+    <string name="step_map">2. SELECT ARENA</string>
+    <string name="step_config">3. CONFIGURATION</string>
+
+    <string name="mode_vs_player">VS PLAYER</string>
+    <string name="mode_vs_player_sub">Local multiplayer split-screen</string>
+    <string name="mode_vs_ai">VS AI BOT</string>
+    <string name="mode_vs_ai_sub">Challenge our tactical drone</string>
+    <string name="mode_solo">SOLO RUN</string>
+    <string name="mode_solo_sub">Time attack and practice</string>
+
+    <string name="label_players">NUMBER OF PILOTS</string>
+    <string name="label_ai_difficulty">AI STRENGTH</string>
+    <string name="ai_easy">EASY</string>
+    <string name="ai_normal">NORMAL</string>
+    <string name="ai_hard">HARD</string>
+
+    <string name="label_time_limit">TIME LIMIT</string>
+    <string name="time_1min">1 MIN</string>
+    <string name="time_3min">3 MIN</string>
+    <string name="time_5min">5 MIN</string>
+    <string name="time_unlimited">NO LIMIT</string>
+
+    <string name="btn_start">START MISSION</string>
+    <string name="btn_start_game">INITIATE BATTLE</string>
+    <string name="map_locked">Map Locked</string>
+
+    <!-- Game -->
+    <string name="timer_default">02:59</string>
+    <string name="score_p1_format">P1: %1$03d</string>
+    <string name="score_p2_format">%1$03d :P2</string>
+    <string name="pause_desc">Pause Game</string>
+    <string name="tilt_desc">Tilt Indicator</string>
+    <string name="msg_paused">PAUSED</string>
+    <string name="btn_resume">RESUME</string>
+    <string name="btn_restart">RESTART</string>
+    <string name="btn_quit">QUIT TO MENU</string>
+
+    <!-- Result -->
+    <string name="mission_complete">MISSION COMPLETE</string>
+    <string name="rank_1st">1ST</string>
+    <string name="rank_2nd">2ND</string>
+    <string name="btn_play_again">PLAY AGAIN</string>
+
+    <!-- Settings -->
+    <string name="settings_title">SYSTEM SETTINGS</string>
+    <string name="label_sensitivity">SENSOR SENSITIVITY</string>
+    <string name="label_audio">AUDIO &amp; HAPTICS</string>
+    <string name="label_music">MUSIC</string>
+    <string name="label_sfx">SOUND EFFECTS</string>
+    <string name="label_vibration">VIBRATION</string>
+    <string name="btn_reset_progress">RESET PROGRESS</string>
+</resources>

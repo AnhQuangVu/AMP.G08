@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Neon cyan button – normal state -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#4D00F5FF">
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFFFF" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#1A00F5FF" />
+            <stroke android:width="1.5dp" android:color="#00F5FF" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</ripple>
