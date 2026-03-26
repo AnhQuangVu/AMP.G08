@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "195163954777",
+    "project_id": "app-tilt-arena",
+    "storage_bucket": "app-tilt-arena.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:195163954777:android:7e3471ac2bd8acbcbb1b48",
+        "android_client_info": {
+          "package_name": "com.example.ampg08"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuGC3bYNG0x8cOWaBWXk0VdHydp5u9XzY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
