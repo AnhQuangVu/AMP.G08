@@ -15,6 +15,10 @@
     <string name="menu_profile">PROFILE</string>
     <string name="version_text">v1.0.0-ALPHA</string>
 
+    <string name="leaderboard_wins_format">%1$d W</string>
+    <string name="leaderboard_matches_format">%1$d games</string>
+    <string name="leaderboard_unknown_name">Unknown</string>
+
     <!-- Splash -->
     <string name="loading_assets">LOADING ASSETS&#8230;</string>
 
