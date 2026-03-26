@@ -53,8 +53,8 @@ public class CollisionDetector {
                             ball.vx -= 1.4f * dot * nx;
                             ball.vy -= 1.4f * dot * ny;
                             // Giảm năng lượng sau va chạm
-                            ball.vx *= 0.5f;
-                            ball.vy *= 0.5f;
+                            ball.vx *= 0.75f;
+                            ball.vy *= 0.75f;
                         }
                     }
                 }

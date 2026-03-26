@@ -8,7 +8,7 @@ public class Ball {
     public boolean boosted;    // Đang skill tăng tốc
     public long boostUntil;    // Timestamp kết thúc boost
 
-    private static final float FRICTION = 0.92f;
+    private static final float FRICTION = 1f;
     private static final float MAX_SPEED = 1200f;   // pixel/s
     private static final float BOOST_MULTIPLIER = 2.2f;
 
@@ -30,7 +30,7 @@ public class Ball {
         } else {
             boosted = false;
         }
-        float sensitivity = 60f * multiplier;
+        float sensitivity = 200f * multiplier;
         vx += -ax * sensitivity * dt;
         vy +=  ay * sensitivity * dt;
 
