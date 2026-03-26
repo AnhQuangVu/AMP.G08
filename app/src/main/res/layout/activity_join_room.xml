@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_background"
+    android:padding="24dp">
+
+    <ImageButton android:id="@+id/btnBack"
+        android:layout_width="48dp" android:layout_height="48dp"
+        android:src="@android:drawable/ic_media_previous"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:tint="@color/color_primary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView android:id="@+id/tvTitle"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="JOIN ROOM" android:textSize="28sp"
+        android:textColor="@color/color_primary" android:fontFamily="@font/orbitron"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/btnBack"
+        app:layout_constraintStart_toStartOf="parent" android:layout_marginTop="16dp" />
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Nhập mã phòng từ người tạo"
+        android:textColor="@color/color_text_hint" android:fontFamily="@font/rajdhani"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent" android:layout_marginTop="8dp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilRoomCode"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        android:hint="Room Code"
+        app:boxStrokeColor="@color/color_secondary"
+        app:hintTextColor="@color/color_secondary"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="60dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etRoomCode"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="textNoSuggestions"
+            android:textColor="@color/color_secondary"
+            android:fontFamily="@font/orbitron"
+            android:textSize="18sp" android:letterSpacing="0.1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button android:id="@+id/btnJoin"
+        style="@style/ButtonStyle.Neon.Orange"
+        android:layout_width="0dp" android:layout_height="56dp"
+        android:text="JOIN ROOM →"
+        app:layout_constraintTop_toBottomOf="@id/tilRoomCode"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

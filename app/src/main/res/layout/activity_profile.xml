@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_background"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <ImageButton android:id="@+id/btnBack"
+            android:layout_width="48dp" android:layout_height="48dp"
+            android:src="@android:drawable/ic_media_previous"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="@color/color_primary"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView android:id="@+id/tvTitle"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="PROFILE" android:textSize="28sp"
+            android:textColor="@color/color_primary" android:fontFamily="@font/orbitron"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/btnBack"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginTop="16dp" />
+
+        <!-- Stats cards -->
+        <LinearLayout android:id="@+id/statsRow"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="24dp">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp" android:layout_height="80dp"
+                android:layout_weight="1" app:cardBackgroundColor="@color/color_surface"
+                app:cardCornerRadius="12dp" android:layout_marginEnd="8dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:gravity="center" android:orientation="vertical">
+                    <TextView android:id="@+id/tvWins"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0" android:textSize="28sp"
+                        android:textColor="@color/color_secondary" android:fontFamily="@font/orbitron" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="WINS" android:textSize="12sp"
+                        android:textColor="@color/color_text_hint" android:fontFamily="@font/rajdhani" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp" android:layout_height="80dp"
+                android:layout_weight="1" app:cardBackgroundColor="@color/color_surface"
+                app:cardCornerRadius="12dp" android:layout_marginHorizontal="4dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:gravity="center" android:orientation="vertical">
+                    <TextView android:id="@+id/tvMatches"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0" android:textSize="28sp"
+                        android:textColor="@color/color_primary" android:fontFamily="@font/orbitron" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="MATCHES" android:textSize="12sp"
+                        android:textColor="@color/color_text_hint" android:fontFamily="@font/rajdhani" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp" android:layout_height="80dp"
+                android:layout_weight="1" app:cardBackgroundColor="@color/color_surface"
+                app:cardCornerRadius="12dp" android:layout_marginStart="8dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:gravity="center" android:orientation="vertical">
+                    <TextView android:id="@+id/tvWinRate"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0%" android:textSize="28sp"
+                        android:textColor="@color/color_diff_easy" android:fontFamily="@font/orbitron" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="WIN RATE" android:textSize="12sp"
+                        android:textColor="@color/color_text_hint" android:fontFamily="@font/rajdhani" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+        <!-- Email -->
+        <TextView android:id="@+id/tvEmail"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="" android:textSize="14sp"
+            android:textColor="@color/color_text_hint" android:fontFamily="@font/rajdhani"
+            app:layout_constraintTop_toBottomOf="@id/statsRow"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="24dp" />
+
+        <!-- Edit name -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilName"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:hint="Display Name"
+            app:boxStrokeColor="@color/color_primary"
+            app:hintTextColor="@color/color_primary"
+            app:layout_constraintTop_toBottomOf="@id/tvEmail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDisplayName"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:textColor="@color/color_text_primary"
+                android:fontFamily="@font/rajdhani" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button android:id="@+id/btnSave"
+            style="@style/ButtonStyle.Neon"
+            android:layout_width="0dp" android:layout_height="52dp"
+            android:text="SAVE CHANGES"
+            app:layout_constraintTop_toBottomOf="@id/tilName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

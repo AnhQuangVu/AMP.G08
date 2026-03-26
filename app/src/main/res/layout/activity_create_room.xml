@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_background"
+    android:padding="24dp">
+
+    <ImageButton android:id="@+id/btnBack"
+        android:layout_width="48dp" android:layout_height="48dp"
+        android:src="@android:drawable/ic_media_previous"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:tint="@color/color_primary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView android:id="@+id/tvTitle"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="CREATE ROOM" android:textSize="28sp"
+        android:textColor="@color/color_primary" android:fontFamily="@font/orbitron"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/btnBack"
+        app:layout_constraintStart_toStartOf="parent" android:layout_marginTop="16dp" />
+
+    <Button android:id="@+id/btnCreate"
+        style="@style/ButtonStyle.Neon.Large"
+        android:layout_width="0dp" android:layout_height="56dp"
+        android:text="⊕  GENERATE ROOM"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="40dp" />
+
+    <TextView android:id="@+id/tvHintCopy"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Share room code:" android:textColor="@color/color_text_hint"
+        android:fontFamily="@font/rajdhani" android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/btnCreate"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="32dp" />
+
+    <TextView android:id="@+id/tvRoomCode"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        android:text="" android:textSize="22sp"
+        android:textColor="@color/color_primary" android:fontFamily="@font/orbitron"
+        android:textStyle="bold" android:letterSpacing="0.2"
+        android:padding="16dp" android:background="@color/color_surface"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tvHintCopy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp" />
+
+    <Button android:id="@+id/btnCopy"
+        style="@style/ButtonStyle.Neon"
+        android:layout_width="wrap_content" android:layout_height="44dp"
+        android:text="COPY" android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tvRoomCode"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="12dp" />
+
+    <Button android:id="@+id/btnGoLobby"
+        style="@style/ButtonStyle.Neon.Orange"
+        android:layout_width="0dp" android:layout_height="52dp"
+        android:text="GO TO LOBBY →" android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/btnCopy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
