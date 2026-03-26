@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Tilt Arena</string>
+    <!-- ⚠️ THAY GIÁ TRỊ NÀY bằng Web Client ID từ Firebase Console → Authentication → Sign-in method → Google → Web client ID -->
+    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID_HERE</string>
 
     <!-- Titles -->
     <string name="title_tilt">TILT</string>

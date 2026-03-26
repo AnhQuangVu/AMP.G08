@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,6 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TiltArena">
 
+        <!-- SPLASH – điểm vào duy nhất -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
@@ -22,11 +26,33 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity" android:exported="false" />
+        <!-- AUTH -->
         <activity android:name=".LoginActivity" android:exported="false" />
-        <activity android:name=".PlaySetupActivity" android:exported="false" />
-        <activity android:name=".GameActivity" android:exported="false" />
+        <activity android:name=".RegisterActivity" android:exported="false" />
+
+        <!-- MAIN -->
+        <activity android:name=".HomeActivity" android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="false" />
+
+        <!-- ROOM -->
+        <activity android:name=".CreateRoomActivity" android:exported="false" />
+        <activity android:name=".JoinRoomActivity" android:exported="false" />
+        <activity android:name=".LobbyActivity" android:exported="false" />
+
+        <!-- GAME -->
+        <activity
+            android:name=".GameActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize" />
+
+        <!-- RESULT & PROFILE -->
         <activity android:name=".ResultActivity" android:exported="false" />
+        <activity android:name=".ProfileActivity" android:exported="false" />
+        <activity android:name=".LeaderboardActivity" android:exported="false" />
+
+        <!-- Legacy -->
+        <activity android:name=".PlaySetupActivity" android:exported="false" />
         <activity android:name=".ScoreActivity" android:exported="false" />
         <activity android:name=".SettingsActivity" android:exported="false" />
 

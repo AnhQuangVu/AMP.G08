@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.animation.AccelerateDecelerateInterpolator;
+
 import com.example.ampg08.databinding.ActivitySplashBinding;
+import com.example.ampg08.firebase.FirebaseAuthManager;
 
 public class SplashActivity extends BaseActivity {
 
@@ -17,38 +19,34 @@ public class SplashActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         binding = ActivitySplashBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
+        hideSystemUI();
         startAnimations();
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            startActivity(new Intent(SplashActivity.this, MainActivity.class));
+            // Kiểm tra Firebase Auth – đã đăng nhập → Home, chưa → Login
+            if (FirebaseAuthManager.getInstance().isLoggedIn()) {
+                startActivity(new Intent(this, HomeActivity.class));
+            } else {
+                startActivity(new Intent(this, LoginActivity.class));
+            }
             finish();
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }, SPLASH_DELAY);
     }
 
     private void startAnimations() {
-        // Logo Animation: Scale + Fade In
         binding.logoLayout.setAlpha(0f);
         binding.logoLayout.setScaleX(0.8f);
         binding.logoLayout.setScaleY(0.8f);
-
         binding.logoLayout.animate()
-                .alpha(1f)
-                .scaleX(1f)
-                .scaleY(1f)
+                .alpha(1f).scaleX(1f).scaleY(1f)
                 .setDuration(1200)
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .start();
 
-        // Loading text pulse
         binding.tvLoading.animate()
-                .alpha(0.3f)
-                .setDuration(800)
-                .setStartDelay(500)
-                .withEndAction(() -> {
-                    binding.tvLoading.animate().alpha(1f).setDuration(800).start();
-                })
+                .alpha(0.3f).setDuration(800).setStartDelay(500)
+                .withEndAction(() -> binding.tvLoading.animate().alpha(1f).setDuration(800).start())
                 .start();
     }
 }
