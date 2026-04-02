@@ -36,6 +36,12 @@ public class LoginActivity extends BaseActivity {
         binding.btnGoogle.setOnClickListener(v -> doGoogleSignIn());
         binding.tvGoRegister.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class)));
+
+        String prefillEmail = getIntent().getStringExtra("prefill_email");
+        if (!TextUtils.isEmpty(prefillEmail)) {
+            binding.etEmail.setText(prefillEmail);
+            binding.etPassword.requestFocus();
+        }
     }
 
     private void doEmailLogin() {

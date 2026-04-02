@@ -93,12 +93,22 @@ public class RegisterActivity extends BaseActivity {
                     FirestoreManager.getInstance().createUser(user, new FirestoreManager.OnCompleteCallback() {
                         @Override
                         public void onSuccess() {
-                            startActivity(new Intent(RegisterActivity.this, HomeActivity.class)
-                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                            completeRegistrationSuccess(email, false);
                         }
 
                         @Override
                         public void onFailure(String error) {
+                            FirebaseUser currentUser = authManager.getCurrentUser();
+                            boolean authAlreadyCreated = currentUser != null
+                                    && currentUser.getEmail() != null
+                                    && currentUser.getEmail().equalsIgnoreCase(email);
+
+                            if (authAlreadyCreated) {
+                                Log.w(TAG, "Profile creation failed but auth account already created: " + error);
+                                completeRegistrationSuccess(email, true);
+                                return;
+                            }
+
                             setLoading(false);
                             Toast.makeText(RegisterActivity.this, "Lỗi tạo hồ sơ: " + error, Toast.LENGTH_SHORT).show();
                         }
@@ -187,5 +197,20 @@ public class RegisterActivity extends BaseActivity {
     private void setLoading(boolean loading) {
         binding.progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
         binding.btnRegister.setEnabled(!loading);
+    }
+
+    private void completeRegistrationSuccess(String email, boolean profilePending) {
+        setLoading(false);
+        authManager.signOut(this);
+
+        String message = profilePending
+                ? "Đăng ký thành công. Hồ sơ sẽ được hoàn tất khi bạn đăng nhập lại."
+                : "Đăng ký thành công. Mời bạn đăng nhập.";
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra("prefill_email", email);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }
