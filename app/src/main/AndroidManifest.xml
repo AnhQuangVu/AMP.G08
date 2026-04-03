@@ -2,12 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Network permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Sensors -->
+    <!-- Sensor features -->
     <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
-    <uses-feature android:name="android.hardware.sensor.proximity" android:required="true" />
+    <uses-feature android:name="android.hardware.sensor.proximity" android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -17,9 +18,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.TiltArena">
+        android:theme="@style/Theme.TiltArena"
+        tools:targetApi="31">
 
-        <!-- SPLASH – điểm vào duy nhất -->
+        <!-- Splash -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
@@ -30,35 +32,36 @@
             </intent-filter>
         </activity>
 
-        <!-- AUTH -->
+        <!-- Auth -->
         <activity android:name=".LoginActivity" android:exported="false" />
         <activity android:name=".RegisterActivity" android:exported="false" />
 
-        <!-- MAIN -->
+        <!-- Home -->
         <activity android:name=".HomeActivity" android:exported="false" />
-        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".ProfileActivity" android:exported="false" />
+        <activity android:name=".SettingsActivity" android:exported="false" />
+        <activity android:name=".LeaderboardActivity" android:exported="false" />
 
-        <!-- ROOM -->
+        <!-- Room Management -->
         <activity android:name=".CreateRoomActivity" android:exported="false" />
         <activity android:name=".JoinRoomActivity" android:exported="false" />
         <activity android:name=".LobbyActivity" android:exported="false" />
 
-        <!-- GAME -->
+        <!-- Game -->
         <activity
             android:name=".GameActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:keepScreenOn="true" />
 
-        <!-- RESULT & PROFILE -->
+        <!-- Result -->
         <activity android:name=".ResultActivity" android:exported="false" />
-        <activity android:name=".ProfileActivity" android:exported="false" />
-        <activity android:name=".LeaderboardActivity" android:exported="false" />
 
-        <!-- Legacy -->
+        <!-- Legacy activities (if needed) -->
+        <activity android:name=".MainActivity" android:exported="false" />
         <activity android:name=".PlaySetupActivity" android:exported="false" />
         <activity android:name=".ScoreActivity" android:exported="false" />
-        <activity android:name=".SettingsActivity" android:exported="false" />
 
     </application>
 

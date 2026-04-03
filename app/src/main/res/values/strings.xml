@@ -1,93 +1,112 @@
 <resources>
     <string name="app_name">Tilt Arena</string>
-    <!-- ⚠️ THAY GIÁ TRỊ NÀY bằng Web Client ID từ Firebase Console → Authentication → Sign-in method → Google → Web client ID -->
-    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID_HERE</string>
 
-    <!-- Titles -->
+    <!-- Common -->
+    <string name="loading">Đang tải...</string>
+    <string name="error">Lỗi</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Hủy</string>
+    <string name="back">Quay lại</string>
+    <string name="save">Lưu</string>
+    <string name="pause">Tạm dừng</string>
+
+    <!-- Main Activity -->
     <string name="title_tilt">TILT</string>
     <string name="title_arena">ARENA</string>
+    <string name="menu_play">CHƠI</string>
+    <string name="menu_score">ĐIỂM SỐ</string>
+    <string name="menu_settings">CÀI ĐẶT</string>
+    <string name="menu_login">ĐĂNG NHẬP</string>
+    <string name="version_text">v1.0.0</string>
 
-    <!-- Menu -->
-    <string name="menu_play">PLAY</string>
-    <string name="menu_score">SCORE</string>
-    <string name="menu_settings">SETTINGS</string>
-    <string name="menu_login">LOGIN</string>
-    <string name="menu_profile">PROFILE</string>
-    <string name="version_text">v1.0.0-ALPHA</string>
+    <!-- Play Setup -->
+    <string name="setup_title">THIẾT LẬP TRẬN ĐẤU</string>
+    <string name="step_mode">Chế độ chơi</string>
+    <string name="step_map">Chọn bản đồ</string>
+    <string name="mode_vs_player">VS Người chơi</string>
+    <string name="mode_vs_ai">VS AI</string>
+    <string name="btn_start">BẮT ĐẦU</string>
 
-    <string name="leaderboard_wins_format">%1$d W</string>
-    <string name="leaderboard_matches_format">%1$d games</string>
-    <string name="leaderboard_unknown_name">Unknown</string>
+    <!-- Map Select Fragment -->
+    <string name="map_select_title">CHỌN BẢN ĐỒ</string>
 
-    <!-- Splash -->
-    <string name="loading_assets">LOADING ASSETS&#8230;</string>
+    <!-- Match Setup Fragment -->
+    <string name="match_setup_title">THIẾT LẬP TRẬN</string>
+    <string name="label_players">Số người chơi</string>
+    <string name="label_ai_difficulty">Độ khó AI</string>
+    <string name="ai_easy">Dễ</string>
+    <string name="ai_normal">Trung bình</string>
+    <string name="ai_hard">Khó</string>
 
-    <!-- Login -->
-    <string name="login_title">ACCESS GRANTED</string>
-    <string name="username_hint">PILOT NAME</string>
-    <string name="password_hint">ACCESS CODE</string>
-    <string name="btn_login">AUTHENTICATE</string>
-    <string name="btn_register">NEW PILOT</string>
-    <string name="btn_guest">GUEST MODE</string>
-    <string name="btn_google">GOOGLE SIGN-IN</string>
-    <string name="label_or">OR</string>
+    <!-- Time Limit -->
+    <string name="label_time_limit">Giới hạn thời gian</string>
+    <string name="time_1min">1 phút</string>
+    <string name="time_3min">3 phút</string>
+    <string name="time_5min">5 phút</string>
+    <string name="time_unlimited">Không giới hạn</string>
+    <string name="btn_start_game">BẮT ĐẦU CHƠI</string>
 
-    <!-- Play Setup & Fragments -->
-    <string name="setup_title">MISSION BRIEFING</string>
-    <string name="mode_select_title">SELECT MODE</string>
-    <string name="map_select_title">SELECT ARENA</string>
-    <string name="match_setup_title">MATCH CONFIG</string>
+    <!-- Mode Select Fragment -->
+    <string name="mode_select_title">CHỌN CHẾ ĐỘ CHƠI</string>
+    <string name="mode_vs_player_sub">Đấu với bạn bè qua mạng</string>
+    <string name="mode_vs_ai_sub">Đấu với máy tính</string>
+    <string name="mode_solo">Solo</string>
+    <string name="mode_solo_sub">Luyện tập một mình</string>
 
-    <string name="step_mode">1. SELECT MODE</string>
-    <string name="step_map">2. SELECT ARENA</string>
-    <string name="step_config">3. CONFIGURATION</string>
+    <!-- Map Card -->
+    <string name="map_locked">🔒 Đã khóa</string>
 
-    <string name="mode_vs_player">VS PLAYER</string>
-    <string name="mode_vs_player_sub">Local multiplayer split-screen</string>
-    <string name="mode_vs_ai">VS AI BOT</string>
-    <string name="mode_vs_ai_sub">Challenge our tactical drone</string>
-    <string name="mode_solo">SOLO RUN</string>
-    <string name="mode_solo_sub">Time attack and practice</string>
+    <!-- Auth -->
+    <string name="login">Đăng nhập</string>
+    <string name="register">Đăng ký</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="email">Email</string>
+    <string name="password">Mật khẩu</string>
+    <string name="confirm_password">Xác nhận mật khẩu</string>
+    <string name="display_name">Tên hiển thị</string>
+    <string name="login_with_google">Đăng nhập với Google</string>
+    <string name="no_account">Chưa có tài khoản?</string>
+    <string name="have_account">Đã có tài khoản?</string>
 
-    <string name="label_players">NUMBER OF PILOTS</string>
-    <string name="label_ai_difficulty">AI STRENGTH</string>
-    <string name="ai_easy">EASY</string>
-    <string name="ai_normal">NORMAL</string>
-    <string name="ai_hard">HARD</string>
+    <!-- Home -->
+    <string name="create_room">Tạo phòng</string>
+    <string name="join_room">Vào phòng</string>
+    <string name="practice">Luyện tập</string>
+    <string name="leaderboard">Bảng xếp hạng</string>
+    <string name="profile">Hồ sơ</string>
 
-    <string name="label_time_limit">TIME LIMIT</string>
-    <string name="time_1min">1 MIN</string>
-    <string name="time_3min">3 MIN</string>
-    <string name="time_5min">5 MIN</string>
-    <string name="time_unlimited">NO LIMIT</string>
-
-    <string name="btn_start">START MISSION</string>
-    <string name="btn_start_game">INITIATE BATTLE</string>
-    <string name="map_locked">Map Locked</string>
+    <!-- Room -->
+    <string name="room_code">Mã phòng</string>
+    <string name="enter_room_code">Nhập mã phòng</string>
+    <string name="copy_code">Sao chép mã</string>
+    <string name="go_to_lobby">Vào sảnh chờ</string>
+    <string name="ready">Sẵn sàng</string>
+    <string name="start_game">Bắt đầu</string>
+    <string name="waiting_players">Chờ người chơi...</string>
 
     <!-- Game -->
-    <string name="timer_default">02:59</string>
-    <string name="score_p1_format">P1: %1$03d</string>
-    <string name="score_p2_format">%1$03d :P2</string>
-    <string name="pause_desc">Pause Game</string>
-    <string name="tilt_desc">Tilt Indicator</string>
-    <string name="msg_paused">PAUSED</string>
-    <string name="btn_resume">RESUME</string>
-    <string name="btn_restart">RESTART</string>
-    <string name="btn_quit">QUIT TO MENU</string>
+    <string name="skill_boost">BOOST!</string>
+    <string name="skill_freeze">FREEZE!</string>
+    <string name="frozen">❄️ Bạn đang bị đóng băng!</string>
 
     <!-- Result -->
-    <string name="mission_complete">MISSION COMPLETE</string>
-    <string name="rank_1st">1ST</string>
-    <string name="rank_2nd">2ND</string>
-    <string name="btn_play_again">PLAY AGAIN</string>
+    <string name="finished">Hoàn thành!</string>
+    <string name="winner">Người chiến thắng</string>
+    <string name="your_time">Thời gian của bạn</string>
+    <string name="play_again">Chơi lại</string>
+    <string name="go_home">Về trang chủ</string>
 
-    <!-- Settings -->
-    <string name="settings_title">SYSTEM SETTINGS</string>
-    <string name="label_sensitivity">SENSOR SENSITIVITY</string>
-    <string name="label_audio">AUDIO &amp; HAPTICS</string>
-    <string name="label_music">MUSIC</string>
-    <string name="label_sfx">SOUND EFFECTS</string>
-    <string name="label_vibration">VIBRATION</string>
-    <string name="btn_reset_progress">RESET PROGRESS</string>
+    <!-- Leaderboard -->
+    <string name="top_players">Top 20 người chơi</string>
+    <string name="leaderboard_wins_format">%d thắng</string>
+    <string name="leaderboard_matches_format">%d trận</string>
+    <string name="leaderboard_unknown_name">Ẩn danh</string>
+
+    <!-- Profile -->
+    <string name="total_wins">Số trận thắng</string>
+    <string name="total_matches">Tổng số trận</string>
+    <string name="win_rate">Tỷ lệ thắng</string>
+
+    <!-- Google Sign-In -->
+    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID</string>
 </resources>
