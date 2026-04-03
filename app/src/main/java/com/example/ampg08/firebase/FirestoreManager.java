@@ -5,11 +5,14 @@ import com.example.ampg08.model.PlayerState;
 import com.example.ampg08.model.Room;
 import com.example.ampg08.model.User;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FirestoreManager {
@@ -139,24 +142,31 @@ public class FirestoreManager {
                 .collection(COL_PLAYERS)
                 .addSnapshotListener((snap, e) -> {
                     if (snap != null) {
-                        java.util.List<PlayerState> list = snap.toObjects(PlayerState.class);
-                        callback.onPlayers(list);
+                        List<PlayerState> players = new ArrayList<>();
+                        for (DocumentSnapshot doc : snap.getDocuments()) {
+                            PlayerState ps = doc.toObject(PlayerState.class);
+                            if (ps != null) players.add(ps);
+                        }
+                        callback.onPlayers(players);
                     }
                 });
     }
 
-    // ─── FREEZE SKILL ────────────────────────────────────────────────────
+    // ─── FREEZE COMMAND ─────────────────────────────────────────────────
 
-    public void freezePlayer(String roomId, String targetUid, long frozenUntil) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("frozen", true);
-        data.put("frozenUntil", frozenUntil);
+    public void sendFreezeCommand(String roomId, String targetUid) {
         db.collection(COL_ROOMS).document(roomId)
                 .collection(COL_PLAYERS).document(targetUid)
-                .update(data);
+                .update("freezeRequested", true);
     }
 
-    // ─── MATCHES ─────────────────────────────────────────────────────────
+    public void clearFreezeFlag(String roomId, String uid) {
+        db.collection(COL_ROOMS).document(roomId)
+                .collection(COL_PLAYERS).document(uid)
+                .update("freezeRequested", false);
+    }
+
+    // ─── MATCHES ────────────────────────────────────────────────────────
 
     public void saveMatch(Match match, OnCompleteCallback callback) {
         db.collection(COL_MATCHES).document(match.getMatchId())
@@ -165,42 +175,51 @@ public class FirestoreManager {
                 .addOnFailureListener(e -> callback.onFailure(e.getMessage()));
     }
 
-    // ─── LEADERBOARD ─────────────────────────────────────────────────────
+    // ─── LEADERBOARD ────────────────────────────────────────────────────
+
+    public void getLeaderboard(OnLeaderboardCallback callback) {
+        db.collection(COL_LEADERBOARD)
+                .orderBy("wins", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .limit(20)
+                .get()
+                .addOnSuccessListener(snap -> callback.onResult(snap.getDocuments()))
+                .addOnFailureListener(e -> callback.onResult(null));
+    }
 
     public void incrementWins(String uid, String displayName) {
         DocumentReference ref = db.collection(COL_LEADERBOARD).document(uid);
-        ref.get().addOnSuccessListener(doc -> {
-            if (doc.exists()) {
-                ref.update(
-                        "wins", com.google.firebase.firestore.FieldValue.increment(1),
-                        "totalMatches", com.google.firebase.firestore.FieldValue.increment(1)
-                );
+        db.runTransaction(transaction -> {
+            DocumentSnapshot snap = transaction.get(ref);
+            if (snap.exists()) {
+                long wins = snap.getLong("wins") != null ? snap.getLong("wins") : 0;
+                long total = snap.getLong("totalMatches") != null ? snap.getLong("totalMatches") : 0;
+                transaction.update(ref, "wins", wins + 1, "totalMatches", total + 1);
             } else {
                 Map<String, Object> data = new HashMap<>();
                 data.put("uid", uid);
                 data.put("displayName", displayName);
                 data.put("wins", 1);
                 data.put("totalMatches", 1);
-                ref.set(data);
+                transaction.set(ref, data);
             }
+            return null;
         });
+
+        // Update user collection too
+        db.collection(COL_USERS).document(uid)
+                .update("totalWins", com.google.firebase.firestore.FieldValue.increment(1),
+                        "totalMatches", com.google.firebase.firestore.FieldValue.increment(1));
     }
 
     public void incrementTotalMatches(String uid) {
         db.collection(COL_LEADERBOARD).document(uid)
                 .update("totalMatches", com.google.firebase.firestore.FieldValue.increment(1));
+
+        db.collection(COL_USERS).document(uid)
+                .update("totalMatches", com.google.firebase.firestore.FieldValue.increment(1));
     }
 
-    public void getLeaderboard(OnLeaderboardCallback callback) {
-        db.collection(COL_LEADERBOARD)
-                .orderBy("wins", Query.Direction.DESCENDING)
-                .limit(20)
-                .get()
-                .addOnSuccessListener(snap -> callback.onLeaderboard(snap.getDocuments()))
-                .addOnFailureListener(e -> callback.onLeaderboard(null));
-    }
-
-    // ─── Callbacks ───────────────────────────────────────────────────────
+    // ─── CALLBACKS ──────────────────────────────────────────────────────
 
     public interface OnCompleteCallback {
         void onSuccess();
@@ -216,10 +235,10 @@ public class FirestoreManager {
     }
 
     public interface OnPlayersCallback {
-        void onPlayers(java.util.List<PlayerState> players);
+        void onPlayers(List<PlayerState> players);
     }
 
     public interface OnLeaderboardCallback {
-        void onLeaderboard(java.util.List<com.google.firebase.firestore.DocumentSnapshot> docs);
+        void onResult(List<DocumentSnapshot> docs);
     }
 }

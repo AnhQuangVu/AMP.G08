@@ -1,44 +1,48 @@
 package com.example.ampg08.game;
 
-import com.example.ampg08.model.PlayerState;
-
-import java.util.List;
-
 public class SkillController {
-    private static final long COOLDOWN_MS = 5000L;
-    private static final long FREEZE_MS = 3000L;
 
-    private long skillReadyAt = 0L;
+    private static final long COOLDOWN_MS = 5000L;  // 5 giây cooldown
+    private static final long BOOST_DURATION_MS = 2000L;
+    private static final long FREEZE_DURATION_MS = 3000L;
 
-    public boolean canUse(long nowMs) {
-        return nowMs >= skillReadyAt;
+    private long lastUsedTimeMs = 0L;
+    private boolean isOnCooldown = false;
+
+    public SkillController() {
     }
 
-    public void markUsed(long nowMs) {
-        skillReadyAt = nowMs + COOLDOWN_MS;
+    public boolean canUseSkill() {
+        return !isOnCooldown;
     }
 
-    public long getCooldownRemaining(long nowMs) {
-        return Math.max(0, skillReadyAt - nowMs);
+    public void activateSkill() {
+        lastUsedTimeMs = System.currentTimeMillis();
+        isOnCooldown = true;
     }
 
-    public PlayerState findNearestOpponent(PlayerState me, List<PlayerState> all) {
-        PlayerState nearest = null;
-        double best = Double.MAX_VALUE;
-        for (PlayerState p : all) {
-            if (p.getUid().equals(me.getUid()) || p.isFinished()) continue;
-            double dx = p.getX() - me.getX();
-            double dy = p.getY() - me.getY();
-            double d2 = dx * dx + dy * dy;
-            if (d2 < best) {
-                best = d2;
-                nearest = p;
-            }
+    public void update(long nowMs) {
+        if (isOnCooldown && nowMs - lastUsedTimeMs >= COOLDOWN_MS) {
+            isOnCooldown = false;
         }
-        return nearest;
     }
 
-    public long calcFrozenUntil(long nowMs) {
-        return nowMs + FREEZE_MS;
+    public float getCooldownProgress() {
+        if (!isOnCooldown) return 1f;
+
+        long elapsed = System.currentTimeMillis() - lastUsedTimeMs;
+        return Math.min(1f, (float) elapsed / COOLDOWN_MS);
+    }
+
+    public long getBoostDuration() {
+        return BOOST_DURATION_MS;
+    }
+
+    public long getFreezeDuration() {
+        return FREEZE_DURATION_MS;
+    }
+
+    public long getCooldownMs() {
+        return COOLDOWN_MS;
     }
 }

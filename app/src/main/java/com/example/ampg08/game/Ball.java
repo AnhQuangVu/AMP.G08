@@ -20,7 +20,9 @@ public class Ball {
         this.x = x; this.y = y; this.radius = radius;
         this.vx = 0f; this.vy = 0f;
     }
-
+    public boolean isBoosted(long nowMs) {
+        return boosted && nowMs < boostUntilMs;
+    }
     public void activateBoost(long nowMs) {
         boosted = true;
         boostUntilMs = nowMs + 2000L;
