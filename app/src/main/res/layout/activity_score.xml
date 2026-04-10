@@ -13,6 +13,7 @@
         android:layout_height="48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_back"
+        android:contentDescription="@string/back"
         android:layout_margin="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,7 +24,7 @@
         style="@style/TextStyle.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="HALL OF FAME"
+        android:text="@string/score_title"
         android:textSize="24sp"
         app:layout_constraintTop_toTopOf="@id/btnBack"
         app:layout_constraintBottom_toBottomOf="@id/btnBack"
@@ -42,9 +43,9 @@
         app:layout_constraintTop_toBottomOf="@id/btnBack"
         android:layout_marginTop="16dp">
 
-        <com.google.android.material.tabs.TabItem android:text="GLOBAL" />
-        <com.google.android.material.tabs.TabItem android:text="FRIENDS" />
-        <com.google.android.material.tabs.TabItem android:text="MY SCORES" />
+        <com.google.android.material.tabs.TabItem android:text="@string/score_tab_global" />
+        <com.google.android.material.tabs.TabItem android:text="@string/score_tab_friends" />
+        <com.google.android.material.tabs.TabItem android:text="@string/score_tab_my_scores" />
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -56,5 +57,29 @@
         app:layout_constraintTop_toBottomOf="@id/tabLayout"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:listitem="@android:layout/simple_list_item_2" />
+
+    <ProgressBar
+        android:id="@+id/progressScores"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/rvScores"
+        app:layout_constraintBottom_toBottomOf="@id/rvScores"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tvEmpty"
+        style="@style/TextStyle.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/score_empty"
+        android:textColor="@color/color_text_hint"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/rvScores"
+        app:layout_constraintBottom_toBottomOf="@id/rvScores"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

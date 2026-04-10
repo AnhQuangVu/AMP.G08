@@ -181,11 +181,268 @@
                 android:layout_marginTop="16dp"
                 android:orientation="horizontal"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@android:layout/simple_list_item_1" />
+                tools:listitem="@layout/item_map" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardMapPreview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/color_surface"
+                app:cardCornerRadius="12dp"
+                app:strokeColor="@color/color_primary"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvSelectedMapName"
+                        style="@style/TextStyle.Title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        tools:text="Beginner Maze" />
+
+                    <LinearLayout
+                        android:id="@+id/starsContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/star1"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_star_filled" />
+
+                        <ImageView
+                            android:id="@+id/star2"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginStart="2dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_star_empty" />
+
+                        <ImageView
+                            android:id="@+id/star3"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginStart="2dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_star_empty" />
+
+                        <ImageView
+                            android:id="@+id/star4"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginStart="2dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_star_empty" />
+
+                        <ImageView
+                            android:id="@+id/star5"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginStart="2dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_star_empty" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvSelectedMapDiff"
+                        style="@style/TextStyle.Body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:textStyle="bold"
+                        tools:text="EASY" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- STEP 3: MATCH SETTINGS -->
+            <TextView
+                style="@style/TextStyle.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/match_setup_title"
+                android:textSize="16sp"
+                android:textColor="@color/color_secondary"
+                android:layout_marginTop="24dp" />
+
+            <LinearLayout
+                android:id="@+id/sectionPlayerCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_players"
+                    android:textSize="13sp"
+                    android:textColor="@color/color_text_secondary"
+                    android:fontFamily="@font/rajdhani"
+                    android:textAllCaps="true"
+                    android:layout_marginBottom="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn2Players"
+                        style="@style/ButtonStyle.Neon.Large"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:text="2"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btn3Players"
+                        style="@style/ButtonStyle.Neon"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:text="3"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btn4Players"
+                        style="@style/ButtonStyle.Neon"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:text="4" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sectionAiDifficulty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_ai_difficulty"
+                    android:textSize="13sp"
+                    android:textColor="@color/color_text_secondary"
+                    android:fontFamily="@font/rajdhani"
+                    android:textAllCaps="true"
+                    android:layout_marginBottom="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnAiEasy"
+                        style="@style/ButtonStyle.Neon.Large"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:text="@string/ai_easy"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btnAiNormal"
+                        style="@style/ButtonStyle.Neon"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:text="@string/ai_normal"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btnAiHard"
+                        style="@style/ButtonStyle.Neon"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:text="@string/ai_hard" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_time_limit"
+                android:textSize="13sp"
+                android:textColor="@color/color_text_secondary"
+                android:fontFamily="@font/rajdhani"
+                android:textAllCaps="true"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp" />
+
+            <RadioGroup
+                android:id="@+id/rgTimeLimit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rb1Min"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/time_1min"
+                    android:textColor="@color/color_text_primary"
+                    android:buttonTint="@color/color_primary"
+                    android:fontFamily="@font/rajdhani"
+                    android:textSize="13sp" />
+
+                <RadioButton
+                    android:id="@+id/rb3Min"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/time_3min"
+                    android:textColor="@color/color_text_primary"
+                    android:buttonTint="@color/color_primary"
+                    android:fontFamily="@font/rajdhani"
+                    android:textSize="13sp"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:id="@+id/rb5Min"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/time_5min"
+                    android:textColor="@color/color_text_primary"
+                    android:buttonTint="@color/color_primary"
+                    android:fontFamily="@font/rajdhani"
+                    android:textSize="13sp" />
+
+                <RadioButton
+                    android:id="@+id/rbNoLimit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/time_unlimited"
+                    android:textColor="@color/color_text_primary"
+                    android:buttonTint="@color/color_primary"
+                    android:fontFamily="@font/rajdhani"
+                    android:textSize="13sp" />
+            </RadioGroup>
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="100dp" /> <!-- Bottom Spacer -->
+                android:layout_height="24dp" />
 
         </LinearLayout>
     </ScrollView>

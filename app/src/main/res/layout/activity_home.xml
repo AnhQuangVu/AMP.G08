@@ -30,18 +30,23 @@
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:padding="16dp" android:orientation="horizontal" android:gravity="center_vertical">
 
-            <TextView android:layout_width="52dp" android:layout_height="52dp"
-                android:text="👤" android:textSize="32sp" android:gravity="center" />
+            <ImageView
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:src="@drawable/ic_profile"
+                android:contentDescription="@string/profile"
+                app:tint="@color/color_primary"
+                android:padding="8dp" />
 
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="12dp">
                 <TextView android:id="@+id/tvUsername"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Player" android:textColor="@color/color_text_primary"
+                    android:text="@string/home_player_default" android:textColor="@color/color_text_primary"
                     android:textSize="18sp" android:fontFamily="@font/rajdhani" android:textStyle="bold" />
                 <TextView android:id="@+id/tvStats"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="0 thắng / 0 trận" android:textColor="@color/color_primary"
+                    android:text="@string/home_stats_default" android:textColor="@color/color_primary"
                     android:textSize="13sp" android:fontFamily="@font/rajdhani" />
             </LinearLayout>
 
@@ -49,7 +54,8 @@
                 android:layout_width="36dp" android:layout_height="36dp"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:tint="@color/color_secondary" />
+                app:tint="@color/color_secondary"
+                android:contentDescription="@string/logout" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
@@ -57,7 +63,7 @@
     <TextView
         android:id="@+id/tvTitleHome"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="TILT ARENA"
+        android:text="@string/home_title"
         android:textSize="36sp" android:textColor="@color/color_primary"
         android:fontFamily="@font/orbitron" android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/cardUser"
@@ -78,32 +84,73 @@
         <Button android:id="@+id/btnCreate"
             style="@style/ButtonStyle.Neon.Large"
             android:layout_width="match_parent" android:layout_height="56dp"
-            android:text="⊕  CREATE ROOM"
+            android:text="@string/home_btn_create_room"
             android:layout_marginBottom="12dp" />
 
         <Button android:id="@+id/btnJoin"
             style="@style/ButtonStyle.Neon"
             android:layout_width="match_parent" android:layout_height="52dp"
-            android:text="↗  JOIN ROOM"
+            android:text="@string/home_btn_join_room"
             android:layout_marginBottom="12dp" />
 
         <Button android:id="@+id/btnPractice"
             style="@style/ButtonStyle.Neon"
             android:layout_width="match_parent" android:layout_height="52dp"
-            android:text="⚡  PRACTICE"
+            android:text="@string/home_btn_practice"
             android:layout_marginBottom="12dp" />
+
+        <Button android:id="@+id/btnMatchSetup"
+            style="@style/ButtonStyle.Neon"
+            android:layout_width="match_parent" android:layout_height="52dp"
+            android:text="@string/home_btn_match_setup"
+            android:layout_marginBottom="12dp" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+            <Button android:id="@+id/btnScore"
+                style="@style/ButtonStyle.Neon"
+                android:layout_width="0dp" android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="@null"
+                android:drawableTop="@drawable/ic_score"
+                android:drawableTint="@color/color_primary"
+                android:gravity="center"
+                android:contentDescription="@string/home_btn_score"
+                android:layout_marginEnd="6dp" />
+            <Button android:id="@+id/btnSettings"
+                style="@style/ButtonStyle.Neon"
+                android:layout_width="0dp" android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="@null"
+                android:drawableTop="@drawable/ic_settings"
+                android:drawableTint="@color/color_primary"
+                android:gravity="center"
+                android:contentDescription="@string/home_btn_settings"
+                android:layout_marginStart="6dp" />
+        </LinearLayout>
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal">
             <Button android:id="@+id/btnLeaderboard"
                 style="@style/ButtonStyle.Neon.Orange"
                 android:layout_width="0dp" android:layout_height="48dp"
-                android:layout_weight="1" android:text="🏆"
+                android:layout_weight="1"
+                android:text="@null"
+                android:drawableTop="@drawable/ic_leaderboard"
+                android:drawableTint="@color/color_primary"
+                android:gravity="center"
+                android:contentDescription="@string/home_btn_leaderboard"
                 android:layout_marginEnd="6dp" />
             <Button android:id="@+id/btnProfile"
                 style="@style/ButtonStyle.Neon"
                 android:layout_width="0dp" android:layout_height="48dp"
-                android:layout_weight="1" android:text="👤"
+                android:layout_weight="1"
+                android:text="@null"
+                android:drawableTop="@drawable/ic_profile"
+                android:drawableTint="@color/color_primary"
+                android:gravity="center"
+                android:contentDescription="@string/home_btn_profile"
                 android:layout_marginStart="6dp" />
         </LinearLayout>
     </LinearLayout>
