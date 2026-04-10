@@ -26,9 +26,15 @@
     <string name="mode_vs_player">VS Người chơi</string>
     <string name="mode_vs_ai">VS AI</string>
     <string name="btn_start">BẮT ĐẦU</string>
+    <string name="select_map_first">Vui lòng chọn bản đồ trước khi bắt đầu.</string>
+    <string name="mode_ai_coming_soon">Chế độ VS AI đang được phát triển.</string>
 
     <!-- Map Select Fragment -->
     <string name="map_select_title">CHỌN BẢN ĐỒ</string>
+    <string name="map_locked_message">Bản đồ này đang bị khóa.</string>
+    <string name="diff_easy">EASY</string>
+    <string name="diff_medium">MEDIUM</string>
+    <string name="diff_hard">HARD</string>
 
     <!-- Match Setup Fragment -->
     <string name="match_setup_title">THIẾT LẬP TRẬN</string>
@@ -74,6 +80,47 @@
     <string name="practice">Luyện tập</string>
     <string name="leaderboard">Bảng xếp hạng</string>
     <string name="profile">Hồ sơ</string>
+    <string name="home_title">TILT ARENA</string>
+    <string name="home_player_default">Player</string>
+    <string name="home_stats_default">0 thắng / 0 trận</string>
+    <string name="home_stats_format">%1$d thắng / %2$d trận</string>
+    <string name="home_avatar_icon">AVATAR</string>
+    <string name="home_btn_create_room">⊕  CREATE ROOM</string>
+    <string name="home_btn_join_room"> JOIN ROOM</string>
+    <string name="home_btn_practice">  PRACTICE</string>
+    <string name="home_btn_match_setup">⚙  MATCH SETUP</string>
+    <string name="home_btn_score">SCORES</string>
+    <string name="home_btn_settings">⚙  SETTINGS</string>
+    <string name="home_btn_leaderboard">🏆  LEADERBOARD</string>
+    <string name="home_btn_profile">👤  PROFILE</string>
+    <string name="home_icon_score">SCORE_ICON</string>
+    <string name="home_icon_settings">SETTINGS_ICON</string>
+    <string name="home_icon_leaderboard">LEADERBOARD_ICON</string>
+    <string name="home_icon_profile">PROFILE_ICON</string>
+
+    <!-- Score -->
+    <string name="score_title">HALL OF FAME</string>
+    <string name="score_tab_global">GLOBAL</string>
+    <string name="score_tab_friends">FRIENDS</string>
+    <string name="score_tab_my_scores">MY SCORES</string>
+    <string name="score_matches_format">%1$d matches</string>
+    <string name="score_no_match_data">No match data</string>
+    <string name="score_empty">No score data yet</string>
+    <string name="score_empty_friends">No friends ranking data yet</string>
+    <string name="score_empty_mine">No personal ranking data yet</string>
+
+    <!-- Settings -->
+    <string name="settings_title">SYSTEM SETTINGS</string>
+    <string name="settings_sensor_sensitivity">SENSOR SENSITIVITY</string>
+    <string name="settings_audio_haptics">AUDIO &amp; HAPTICS</string>
+    <string name="settings_music">MUSIC</string>
+    <string name="settings_sound_effects">SOUND EFFECTS</string>
+    <string name="settings_vibration">VIBRATION</string>
+    <string name="settings_reset_progress">RESET PROGRESS</string>
+    <string name="settings_reset_confirm_title">Reset tiến trình</string>
+    <string name="settings_reset_confirm_message">Bạn có chắc muốn reset toàn bộ cài đặt không?</string>
+    <string name="settings_saved">Đã lưu cài đặt</string>
+    <string name="settings_reset_done">Đã reset cài đặt về mặc định</string>
 
     <!-- Room -->
     <string name="room_code">Mã phòng</string>
@@ -107,6 +154,4 @@
     <string name="total_matches">Tổng số trận</string>
     <string name="win_rate">Tỷ lệ thắng</string>
 
-    <!-- Google Sign-In -->
-    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID</string>
 </resources>
