@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId = "com.example.ampg08"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -49,9 +49,14 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
 
     implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation(libs.firebase.firestore)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.firebase.storage)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
