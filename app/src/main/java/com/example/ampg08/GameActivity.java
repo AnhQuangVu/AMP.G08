@@ -2,18 +2,19 @@ package com.example.ampg08;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import android.app.Dialog;
 import android.widget.Toast;
 
 import com.example.ampg08.databinding.ActivityGameBinding;
+import com.example.ampg08.databinding.PauseOverlayBinding;
 import com.example.ampg08.firebase.FirebaseAuthManager;
-import com.example.ampg08.model.PlayerState;
 
 public class GameActivity extends BaseActivity implements SensorEventListener {
 
@@ -25,14 +26,12 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private Sensor proximitySensor;
+    private Dialog pauseDialog;
+    private boolean keepPausedOnResume;
 
-    private String roomId;
-    private long mapSeed;
+    private String  roomId;
+    private long    mapSeed;
     private boolean offline;
-
-    // Skill cooldown (proximity)
-    private boolean skillOnCooldown = false;
-    private static final long PROXIMITY_COOLDOWN = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +63,9 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
         binding.gameView.setEventListener(new com.example.ampg08.view.GameView.GameEventListener() {
             @Override
             public void onGameFinished(long finishTimeMs) {
-                // Lưu kết quả và navigate Result
                 navigateToResult(finishTimeMs);
             }
+
             @Override
             public void onSkillUsed() {
                 Toast.makeText(GameActivity.this, "⚡ SKILL!", Toast.LENGTH_SHORT).show();
@@ -77,7 +76,7 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
     private void setupSensors() {
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null) {
-            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            accelerometer  = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
         }
     }
@@ -85,18 +84,27 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
     @Override
     protected void onResume() {
         super.onResume();
-        if (accelerometer != null) {
-            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
-        }
-        if (proximitySensor != null) {
-            sensorManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
+        if (keepPausedOnResume) {
+            keepPausedOnResume = false;
+            showPause();
+        } else {
+            setGamePaused(false);
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (sensorManager != null) sensorManager.unregisterListener(this);
+        setGamePaused(true);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (pauseDialog != null && pauseDialog.isShowing()) {
+            pauseDialog.dismiss();
+        }
+        binding.gameView.cleanup();
     }
 
     // ─── Sensor Events ───────────────────────────────────────────────────
@@ -104,18 +112,13 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            // event.values[0] = X (nghiêng trái/phải)
-            // event.values[1] = Y (nghiêng trước/sau)
             binding.gameView.updateTilt(event.values[0], event.values[1]);
 
         } else if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
-            // Khi che tay: giá trị < maximumRange → trigger skill
-            if (event.values[0] < proximitySensor.getMaximumRange() && !skillOnCooldown) {
-                skillOnCooldown = true;
+            // Skill cooldown được quản lý hoàn toàn bởi SkillController trong GameView
+            // KHÔNG có double-cooldown ở Activity nữa
+            if (event.values[0] < proximitySensor.getMaximumRange()) {
                 binding.gameView.onProximityTriggered();
-                // Reset cooldown sau 5s
-                new Handler(Looper.getMainLooper()).postDelayed(
-                        () -> skillOnCooldown = false, PROXIMITY_COOLDOWN);
             }
         }
     }
@@ -135,13 +138,57 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
     }
 
     private void showPause() {
-        // Đơn giản: dialog pause
-        new android.app.AlertDialog.Builder(this)
-                .setTitle("PAUSE")
-                .setMessage("Trò chơi đang tạm dừng")
-                .setPositiveButton("Tiếp tục", null)
-                .setNegativeButton("Thoát", (d, w) -> finish())
-                .setCancelable(false)
-                .show();
+        if (pauseDialog != null && pauseDialog.isShowing()) {
+            return;
+        }
+
+        setGamePaused(true);
+
+        PauseOverlayBinding pauseBinding = PauseOverlayBinding.inflate(getLayoutInflater());
+        pauseDialog = new Dialog(this);
+        pauseDialog.setContentView(pauseBinding.getRoot());
+        pauseDialog.setCancelable(false);
+        if (pauseDialog.getWindow() != null) {
+            pauseDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        pauseBinding.btnResume.setOnClickListener(v -> {
+            pauseDialog.dismiss();
+            setGamePaused(false);
+        });
+        pauseBinding.btnRestart.setOnClickListener(v -> {
+            pauseDialog.dismiss();
+            recreate();
+        });
+        pauseBinding.btnSettings.setOnClickListener(v -> {
+            keepPausedOnResume = true;
+            pauseDialog.dismiss();
+            startActivity(new Intent(this, SettingsActivity.class));
+        });
+        pauseBinding.btnQuit.setOnClickListener(v -> {
+            pauseDialog.dismiss();
+            finish();
+        });
+
+        pauseDialog.show();
+    }
+
+    private void setGamePaused(boolean paused) {
+        if (paused) {
+            binding.gameView.pauseGame();
+            if (sensorManager != null) {
+                sensorManager.unregisterListener(this);
+            }
+        } else {
+            binding.gameView.resumeGame();
+            if (sensorManager != null) {
+                if (accelerometer != null) {
+                    sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+                }
+                if (proximitySensor != null) {
+                    sensorManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
+                }
+            }
+        }
     }
 }

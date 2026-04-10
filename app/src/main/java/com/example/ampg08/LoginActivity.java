@@ -3,6 +3,7 @@ package com.example.ampg08;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -12,11 +13,15 @@ import com.example.ampg08.firebase.FirestoreManager;
 import com.example.ampg08.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends BaseActivity {
+
+    private static final String TAG = "LoginActivity";
 
     private ActivityLoginBinding binding;
     private FirebaseAuthManager authManager;
@@ -29,7 +34,14 @@ public class LoginActivity extends BaseActivity {
         hideSystemUI();
 
         authManager = FirebaseAuthManager.getInstance();
-        authManager.initGoogleSignIn(this, getString(R.string.default_web_client_id));
+        try {
+            authManager.initGoogleSignIn(this, getString(R.string.default_web_client_id));
+        } catch (Exception e) {
+            Log.e(TAG, "Google Sign-In init failed", e);
+            Toast.makeText(this,
+                    "Google Sign-In chưa cấu hình đúng. Kiểm tra google-services.json và SHA-1.",
+                    Toast.LENGTH_LONG).show();
+        }
 
         binding.btnBack.setOnClickListener(v -> finish());
         binding.btnLogin.setOnClickListener(v -> doEmailLogin());
@@ -61,17 +73,46 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void doGoogleSignIn() {
-        Intent signInIntent = authManager.getGoogleSignInIntent();
-        startActivityForResult(signInIntent, FirebaseAuthManager.RC_SIGN_IN);
+        if (!authManager.isGooglePlayServicesAvailable(this)) {
+            int status = authManager.getGooglePlayServicesStatus(this);
+            showGooglePlayServicesError(status);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            Intent signInIntent = authManager.getGoogleSignInIntent();
+            startActivityForResult(signInIntent, FirebaseAuthManager.RC_SIGN_IN);
+        } catch (Exception e) {
+            setLoading(false);
+            Log.e(TAG, "Cannot launch Google Sign-In", e);
+            Toast.makeText(this,
+                    "Không thể mở Google Sign-In. Kiểm tra cấu hình và thử lại.",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == FirebaseAuthManager.RC_SIGN_IN) {
+            if (resultCode != RESULT_OK || data == null) {
+                setLoading(false);
+                Toast.makeText(this, "Bạn đã hủy đăng nhập Google", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
+                if (account == null || account.getIdToken() == null) {
+                    setLoading(false);
+                    Toast.makeText(this,
+                            "Không nhận được token Google. Vui lòng thử lại.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 setLoading(true);
                 authManager.firebaseAuthWithGoogle(account)
                         .addOnSuccessListener(result -> {
@@ -80,12 +121,32 @@ public class LoginActivity extends BaseActivity {
                         })
                         .addOnFailureListener(e -> {
                             setLoading(false);
-                            Toast.makeText(this, "Google thất bại", Toast.LENGTH_SHORT).show();
+                            Log.e(TAG, "Firebase auth with Google failed", e);
+                            Toast.makeText(this,
+                                    authManager.mapFirebaseGoogleAuthError(e),
+                                    Toast.LENGTH_LONG).show();
                         });
             } catch (ApiException e) {
-                Toast.makeText(this, "Google Sign-In lỗi", Toast.LENGTH_SHORT).show();
+                setLoading(false);
+                Log.e(TAG, "Google Sign-In failed, code=" + e.getStatusCode(), e);
+                String message = authManager.mapGoogleSignInError(e) + " (code " + e.getStatusCode() + ")";
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private void showGooglePlayServicesError(int status) {
+        if (status == ConnectionResult.SERVICE_INVALID
+                || status == ConnectionResult.SERVICE_MISSING
+                || status == ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED
+                || status == ConnectionResult.SERVICE_DISABLED) {
+            GoogleApiAvailability.getInstance().getErrorDialog(this, status, 9002).show();
+            return;
+        }
+
+        Toast.makeText(this,
+                "Thiết bị chưa hỗ trợ Google Play Services (code " + status + ")",
+                Toast.LENGTH_LONG).show();
     }
 
     private void ensureUserDoc(FirebaseUser fbUser) {

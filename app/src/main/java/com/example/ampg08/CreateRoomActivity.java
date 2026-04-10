@@ -15,6 +15,12 @@ import com.example.ampg08.model.Room;
 
 public class CreateRoomActivity extends BaseActivity {
 
+    public static final String EXTRA_MAP_SEED = "extra_map_seed";
+    public static final String EXTRA_PLAYER_COUNT = "extra_player_count";
+    public static final String EXTRA_TIME_LIMIT_SECONDS = "extra_time_limit_seconds";
+    public static final String EXTRA_AI_DIFFICULTY = "extra_ai_difficulty";
+    public static final String EXTRA_MODE = "extra_mode";
+
     private ActivityCreateRoomBinding binding;
     private final FirebaseAuthManager auth = FirebaseAuthManager.getInstance();
     private final FirestoreManager db = FirestoreManager.getInstance();
@@ -31,7 +37,12 @@ public class CreateRoomActivity extends BaseActivity {
     }
 
     private void createRoom() {
-        long seed = System.currentTimeMillis();
+        long seed = getIntent().getLongExtra(EXTRA_MAP_SEED, System.currentTimeMillis());
+        int playerCount = getIntent().getIntExtra(EXTRA_PLAYER_COUNT, 2);
+        int timeLimitSeconds = getIntent().getIntExtra(EXTRA_TIME_LIMIT_SECONDS, 180);
+        String aiDifficulty = getIntent().getStringExtra(EXTRA_AI_DIFFICULTY);
+        String mode = getIntent().getStringExtra(EXTRA_MODE);
+
         String hostUid = auth.getCurrentUid();
         if (hostUid == null) {
             Toast.makeText(this, "Cần đăng nhập", Toast.LENGTH_SHORT).show();
@@ -40,6 +51,10 @@ public class CreateRoomActivity extends BaseActivity {
 
         binding.btnCreate.setEnabled(false);
         Room room = new Room("", hostUid, seed);
+        room.setPlayerLimit(Math.max(2, Math.min(4, playerCount)));
+        room.setTimeLimitSeconds(timeLimitSeconds);
+        room.setAiDifficulty(aiDifficulty != null ? aiDifficulty : "EASY");
+        room.setMode(mode != null ? mode : "VS_PLAYER");
 
         db.createRoom(room, createdRoom -> {
             if (createdRoom == null) {
@@ -69,6 +84,8 @@ public class CreateRoomActivity extends BaseActivity {
                         Intent intent = new Intent(CreateRoomActivity.this, LobbyActivity.class);
                         intent.putExtra(LobbyActivity.EXTRA_ROOM_ID, createdRoom.getRoomId());
                         intent.putExtra(LobbyActivity.EXTRA_IS_HOST, true);
+                        intent.putExtra(LobbyActivity.EXTRA_PLAYER_LIMIT, createdRoom.getPlayerLimit());
+                        intent.putExtra(LobbyActivity.EXTRA_TIME_LIMIT_SECONDS, createdRoom.getTimeLimitSeconds());
                         startActivity(intent);
                         finish();
                     });

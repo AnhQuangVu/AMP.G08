@@ -25,26 +25,30 @@ import com.google.firebase.firestore.ListenerRegistration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
 
     // ─── Constants ───────────────────────────────────────────────────────
-    private static final int TARGET_FPS = 60;
-    private static final long FRAME_TIME_NS = 1_000_000_000L / TARGET_FPS;
+    private static final int   TARGET_FPS    = 60;
+    private static final long  FRAME_TIME_NS = 1_000_000_000L / TARGET_FPS;
+    private static final float MAX_DT        = 0.05f; // tránh physics jump
 
     // ─── Game State ──────────────────────────────────────────────────────
-    private Thread gameThread;
-    private volatile boolean isRunning = false;
+    private Thread           gameThread;
+    private volatile boolean isRunning  = false;
+    private volatile boolean isPaused   = false;
     private volatile boolean isFinished = false;
+    private final    Object  pauseLock  = new Object();
 
     // ─── Maze ────────────────────────────────────────────────────────────
-    private MazeGenerator mazeGenerator;
-    private int[][] maze;
-    private MazeRenderer mazeRenderer;
+    private MazeGenerator    mazeGenerator;
+    private int[][]          maze;
+    private MazeRenderer     mazeRenderer;
     private CollisionDetector collisionDetector;
 
     // ─── Ball & Physics ──────────────────────────────────────────────────
-    private Ball localBall;
+    private Ball  localBall;
     private float tiltX = 0f, tiltY = 0f;
 
     // ─── Layout ──────────────────────────────────────────────────────────
@@ -53,13 +57,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float goalCenterX, goalCenterY;
 
     // ─── Multiplayer ─────────────────────────────────────────────────────
-    private String roomId;
-    private String localUid;
-    private String localDisplayName;
+    private String  roomId;
+    private String  localUid;
+    private String  localDisplayName;
     private boolean offline = true;
-    private final Map<String, PlayerState> remotePlayers = new ConcurrentHashMap<>();
-    private ListenerRegistration playersListener;
-    private PositionSyncManager syncManager;
+
+    private final Map<String, PlayerState> remotePlayers    = new ConcurrentHashMap<>();
+    private       ListenerRegistration     playersListener;
+    private       PositionSyncManager      syncManager;
+
+    // Guard: tránh ghi leaderboard nhiều lần
+    private final AtomicBoolean finishWritten = new AtomicBoolean(false);
 
     // ─── Skill ───────────────────────────────────────────────────────────
     private SkillController skillController;
@@ -68,13 +76,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private long gameStartTimeMs;
     private long finishTimeMs;
 
-    // ─── Paints ──────────────────────────────────────────────────────────
+    // ─── Paints (khởi tạo 1 lần) ────────────────────────────────────────
     private Paint ballPaint;
     private Paint remoteBallPaint;
-    private Paint goalPaint;
     private Paint textPaint;
+    private Paint hudTimerPaint;
     private Paint freezeOverlayPaint;
     private Paint boostGlowPaint;
+    private Paint cooldownTrackPaint;
+    private Paint cooldownArcPaint;
+    private Paint cooldownReadyPaint;
+    private Paint playerCountPaint;
+    private Paint remoteNamePaint;
 
     // ─── Listener ────────────────────────────────────────────────────────
     private GameEventListener eventListener;
@@ -84,7 +97,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         void onSkillUsed();
     }
 
-    // ─── Constructor ─────────────────────────────────────────────────────
+    // ─── Constructors ────────────────────────────────────────────────────
 
     public GameView(Context context) {
         super(context);
@@ -104,61 +117,84 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void init() {
         getHolder().addCallback(this);
         setFocusable(true);
+        setLayerType(LAYER_TYPE_HARDWARE, null); // hardware acceleration cho SurfaceView
         initPaints();
-        syncManager = new PositionSyncManager();
+        syncManager    = new PositionSyncManager();
         skillController = new SkillController();
     }
 
     private void initPaints() {
-        // Local ball - Neon Cyan
         ballPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         ballPaint.setColor(0xFF00F5FF);
         ballPaint.setStyle(Paint.Style.FILL);
-        ballPaint.setShadowLayer(20f, 0, 0, 0xFF00F5FF);
+        ballPaint.setShadowLayer(16f, 0, 0, 0xFF00F5FF);
 
-        // Remote ball - Neon Orange
         remoteBallPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         remoteBallPaint.setColor(0xFFFF6B00);
         remoteBallPaint.setStyle(Paint.Style.FILL);
-        remoteBallPaint.setShadowLayer(15f, 0, 0, 0xFFFF6B00);
+        remoteBallPaint.setShadowLayer(12f, 0, 0, 0xFFFF6B00);
 
-        // Goal - Green glow
-        goalPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        goalPaint.setColor(0xFF00FF88);
-        goalPaint.setStyle(Paint.Style.FILL);
-
-        // Text
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setColor(Color.WHITE);
         textPaint.setTextSize(48f);
         textPaint.setTextAlign(Paint.Align.CENTER);
 
-        // Freeze overlay
+        hudTimerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        hudTimerPaint.setColor(0xFF00F5FF);
+        hudTimerPaint.setTextSize(44f);
+        hudTimerPaint.setTextAlign(Paint.Align.CENTER);
+        hudTimerPaint.setFakeBoldText(true);
+
         freezeOverlayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        freezeOverlayPaint.setColor(0x4400BFFF);
+        freezeOverlayPaint.setColor(0x5500BFFF);
         freezeOverlayPaint.setStyle(Paint.Style.FILL);
 
-        // Boost glow
         boostGlowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         boostGlowPaint.setColor(0xFFFFD700);
         boostGlowPaint.setStyle(Paint.Style.STROKE);
         boostGlowPaint.setStrokeWidth(4f);
-        boostGlowPaint.setShadowLayer(25f, 0, 0, 0xFFFFD700);
+        boostGlowPaint.setShadowLayer(20f, 0, 0, 0xFFFFD700);
+
+        cooldownTrackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        cooldownTrackPaint.setColor(0xFF333355);
+        cooldownTrackPaint.setStyle(Paint.Style.STROKE);
+        cooldownTrackPaint.setStrokeWidth(7f);
+
+        cooldownArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        cooldownArcPaint.setColor(0xFF00F5FF);
+        cooldownArcPaint.setStyle(Paint.Style.STROKE);
+        cooldownArcPaint.setStrokeWidth(7f);
+        cooldownArcPaint.setStrokeCap(Paint.Cap.ROUND);
+
+        cooldownReadyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        cooldownReadyPaint.setColor(0xFF00FF88);
+        cooldownReadyPaint.setTextSize(30f);
+        cooldownReadyPaint.setTextAlign(Paint.Align.CENTER);
+
+        playerCountPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        playerCountPaint.setColor(0xFFFFFFFF);
+        playerCountPaint.setTextSize(30f);
+        playerCountPaint.setTextAlign(Paint.Align.RIGHT);
+
+        remoteNamePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        remoteNamePaint.setColor(0xFFFF6B00);
+        remoteNamePaint.setTextSize(22f);
+        remoteNamePaint.setTextAlign(Paint.Align.CENTER);
     }
 
-    // ─── Setup Methods ───────────────────────────────────────────────────
+    // ─── Setup ──────────────────────────────────────────────────────────
 
     public void setupOffline(long seed) {
-        this.offline = true;
-        this.roomId = null;
+        this.offline  = true;
+        this.roomId   = null;
         this.localUid = "local";
         this.localDisplayName = "Player";
         generateMaze(seed);
     }
 
     public void setupGame(long seed, String roomId, String uid, String displayName) {
-        this.offline = false;
-        this.roomId = roomId;
+        this.offline  = false;
+        this.roomId   = roomId;
         this.localUid = uid;
         this.localDisplayName = displayName;
         generateMaze(seed);
@@ -166,52 +202,49 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void generateMaze(long seed) {
-        // Maze size 21x21 cells (ensures perfect maze)
         int mazeRows = 21;
         int mazeCols = 21;
-        mazeGenerator = new MazeGenerator(mazeRows, mazeCols, seed);
-        maze = mazeGenerator.generate();
-        mazeRenderer = new MazeRenderer(maze);
+        mazeGenerator     = new MazeGenerator(mazeRows, mazeCols, seed);
+        maze              = mazeGenerator.generate();
+        mazeRenderer      = new MazeRenderer(maze);
         collisionDetector = new CollisionDetector(maze);
+        // Truyền vị trí goal cho renderer để vẽ nhấp nháy
+        mazeRenderer.setGoal(mazeGenerator.getGoalRow(), mazeGenerator.getGoalCol());
     }
 
     public void computeLayout() {
-        int width = getWidth();
+        int width  = getWidth();
         int height = getHeight();
-
         if (width == 0 || height == 0 || maze == null) return;
 
         int rows = mazeGenerator.getRows();
         int cols = mazeGenerator.getCols();
 
-        // Tính cellSize sao cho maze vừa màn hình (có padding)
-        float padding = 40f;
-        float availableWidth = width - 2 * padding;
-        float availableHeight = height - 2 * padding - 100; // 100 cho HUD
+        float padding         = 40f;
+        float hudHeight       = 100f;
+        float availableWidth  = width  - 2 * padding;
+        float availableHeight = height - 2 * padding - hudHeight;
 
         cellSize = Math.min(availableWidth / cols, availableHeight / rows);
 
-        // Center maze
-        float mazeWidth = cols * cellSize;
+        float mazeWidth  = cols * cellSize;
         float mazeHeight = rows * cellSize;
-        mazeOffsetX = (width - mazeWidth) / 2f;
-        mazeOffsetY = (height - mazeHeight) / 2f + 50; // Offset for HUD
+        mazeOffsetX = (width  - mazeWidth)  / 2f;
+        mazeOffsetY = (height - mazeHeight) / 2f + hudHeight / 2f;
 
-        // Init ball at start position
         float startX = mazeOffsetX + (mazeGenerator.getStartCol() + 0.5f) * cellSize;
         float startY = mazeOffsetY + (mazeGenerator.getStartRow() + 0.5f) * cellSize;
-        float ballRadius = cellSize * 0.35f;
+        float ballRadius = cellSize * 0.32f;
 
         localBall = new Ball(startX, startY, ballRadius);
 
-        // Goal center
         goalCenterX = mazeOffsetX + (mazeGenerator.getGoalCol() + 0.5f) * cellSize;
         goalCenterY = mazeOffsetY + (mazeGenerator.getGoalRow() + 0.5f) * cellSize;
 
-        // Cập nhật collision detector với layout mới
         collisionDetector.setLayout(mazeOffsetX, mazeOffsetY, cellSize);
 
         gameStartTimeMs = System.currentTimeMillis();
+        finishWritten.set(false);
     }
 
     public void setEventListener(GameEventListener listener) {
@@ -225,55 +258,52 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         this.tiltY = ay;
     }
 
+    /**
+     * Gọi khi proximity sensor kích hoạt.
+     * SkillController đã có cooldown — không cần guard thêm ở ngoài.
+     */
     public void onProximityTriggered() {
         if (skillController.canUseSkill()) {
             skillController.activateSkill();
-
-            // Boost bản thân
             localBall.activateBoost(System.currentTimeMillis());
 
-            // Freeze đối thủ gần nhất (nếu multiplayer)
             if (!offline) {
                 freezeNearestOpponent();
             }
 
             if (eventListener != null) {
-                eventListener.onSkillUsed();
+                post(() -> eventListener.onSkillUsed());
             }
         }
     }
 
     private void freezeNearestOpponent() {
-        if (remotePlayers.isEmpty()) return;
+        if (remotePlayers.isEmpty() || roomId == null) return;
 
         String nearestUid = null;
-        float minDist = Float.MAX_VALUE;
+        float  minDistSq  = Float.MAX_VALUE;
 
         for (Map.Entry<String, PlayerState> entry : remotePlayers.entrySet()) {
             if (entry.getKey().equals(localUid)) continue;
-
             PlayerState ps = entry.getValue();
+            if (ps.getFinishTime() > 0) continue; // đã về đích
+
             float dx = ps.getX() - localBall.x;
             float dy = ps.getY() - localBall.y;
-            float dist = dx * dx + dy * dy;
+            float dSq = dx * dx + dy * dy;
 
-            if (dist < minDist) {
-                minDist = dist;
+            if (dSq < minDistSq) {
+                minDistSq  = dSq;
                 nearestUid = entry.getKey();
             }
         }
 
-        if (nearestUid != null && roomId != null) {
-            // Gửi freeze command qua Firestore
+        if (nearestUid != null) {
             FirestoreManager.getInstance().sendFreezeCommand(roomId, nearestUid);
         }
     }
 
-    public void applyFreezeFromRemote() {
-        localBall.applyFreeze(System.currentTimeMillis());
-    }
-
-    // ─── Multiplayer Sync ────────────────────────────────────────────────
+    // ─── Multiplayer ────────────────────────────────────────────────────
 
     private void listenRemotePlayers() {
         if (roomId == null) return;
@@ -282,39 +312,34 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (players == null) return;
 
             for (PlayerState ps : players) {
+                if (ps.getUid() == null) continue;
+
                 if (!ps.getUid().equals(localUid)) {
                     remotePlayers.put(ps.getUid(), ps);
-                }
-
-                // Kiểm tra freeze command cho local player
-                if (ps.getUid().equals(localUid) && ps.isFreezeRequested()) {
-                    applyFreezeFromRemote();
-                    // Clear freeze flag
-                    FirestoreManager.getInstance().clearFreezeFlag(roomId, localUid);
+                } else {
+                    // Kiểm tra freeze command cho local player
+                    if (ps.isFreezeRequested()) {
+                        localBall.applyFreeze(System.currentTimeMillis());
+                        FirestoreManager.getInstance().clearFreezeFlag(roomId, localUid);
+                    }
                 }
             }
         });
 
-        // Start position sync
         syncManager.start(roomId, localUid, new PositionSyncManager.PositionProvider() {
-            @Override
-            public float getX() { return localBall != null ? localBall.x : 0; }
-            @Override
-            public float getY() { return localBall != null ? localBall.y : 0; }
+            @Override public float getX() { return localBall != null ? localBall.x : 0; }
+            @Override public float getY() { return localBall != null ? localBall.y : 0; }
         }, offline);
     }
 
-    // ─── SurfaceView Callbacks ───────────────────────────────────────────
+    // ─── Surface Callbacks ──────────────────────────────────────────────
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
-        if (maze == null) {
-            setupOffline(System.currentTimeMillis());
-        }
+        if (maze == null) setupOffline(System.currentTimeMillis());
         computeLayout();
-        isRunning = true;
-        gameThread = new Thread(this);
-        gameThread.start();
+        isRunning = false; // reset trước khi start
+        startGameThread();
     }
 
     @Override
@@ -324,88 +349,108 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
-        isRunning = false;
+        stopGameThread();
         syncManager.stop();
-        if (playersListener != null) {
-            playersListener.remove();
-        }
-        try {
-            if (gameThread != null) {
-                gameThread.join(500);
-            }
-        } catch (InterruptedException ignored) {}
+        if (playersListener != null) playersListener.remove();
     }
 
-    // ─── Game Loop ───────────────────────────────────────────────────────
+    private void startGameThread() {
+        isRunning = true;
+        isPaused  = false;
+        gameThread = new Thread(this, "GameThread");
+        gameThread.start();
+    }
+
+    private void stopGameThread() {
+        isRunning = false;
+        // Wake up nếu đang wait trong pauseLock
+        synchronized (pauseLock) {
+            pauseLock.notifyAll();
+        }
+        try {
+            if (gameThread != null) gameThread.join(1000);
+        } catch (InterruptedException ignored) {}
+        gameThread = null;
+    }
+
+    /** Gọi từ Activity.onPause() */
+    public void pauseGame() {
+        isPaused = true;
+    }
+
+    /** Gọi từ Activity.onResume() */
+    public void resumeGame() {
+        isPaused = false;
+        synchronized (pauseLock) {
+            pauseLock.notifyAll();
+        }
+    }
+
+    // ─── Game Loop ──────────────────────────────────────────────────────
 
     @Override
     public void run() {
         long lastFrameTime = System.nanoTime();
 
         while (isRunning) {
-            long now = System.nanoTime();
-            float dt = (now - lastFrameTime) / 1_000_000_000f;
-            lastFrameTime = now;
+            // Pause support
+            synchronized (pauseLock) {
+                while (isPaused && isRunning) {
+                    try { pauseLock.wait(); } catch (InterruptedException ignored) {}
+                }
+            }
+            if (!isRunning) break;
 
-            // Giới hạn dt để tránh physics jump
-            dt = Math.min(dt, 0.05f);
+            long now = System.nanoTime();
+            float dt = Math.min((now - lastFrameTime) / 1_000_000_000f, MAX_DT);
+            lastFrameTime = now;
 
             if (!isFinished) {
                 update(dt);
             }
             render();
 
-            // Frame rate control
-            long elapsed = System.nanoTime() - now;
-            long sleepTime = (FRAME_TIME_NS - elapsed) / 1_000_000;
-            if (sleepTime > 0) {
-                try {
-                    Thread.sleep(sleepTime);
-                } catch (InterruptedException ignored) {}
+            // Frame cap
+            long elapsed   = System.nanoTime() - now;
+            long sleepMs   = (FRAME_TIME_NS - elapsed) / 1_000_000;
+            if (sleepMs > 1) {
+                try { Thread.sleep(sleepMs); } catch (InterruptedException ignored) {}
             }
         }
     }
 
     private void update(float dt) {
         if (localBall == null) return;
-
         long nowMs = System.currentTimeMillis();
 
-        // Update ball physics
         localBall.update(tiltX, tiltY, dt, nowMs);
-
-        // Collision detection với tường
         collisionDetector.resolve(localBall);
+        skillController.update(nowMs);
 
         // Check goal
-        float dx = localBall.x - goalCenterX;
-        float dy = localBall.y - goalCenterY;
-        float distToGoal = (float) Math.sqrt(dx * dx + dy * dy);
-
-        if (distToGoal < cellSize * 0.4f) {
+        float dx   = localBall.x - goalCenterX;
+        float dy   = localBall.y - goalCenterY;
+        float dist = (float) Math.sqrt(dx * dx + dy * dy);
+        if (dist < cellSize * 0.45f) {
             onReachGoal();
         }
-
-        // Update skill cooldown
-        skillController.update(nowMs);
     }
 
     private void onReachGoal() {
         if (isFinished) return;
-
-        isFinished = true;
+        isFinished  = true;
         finishTimeMs = System.currentTimeMillis() - gameStartTimeMs;
 
-        // Lưu finish time lên Firestore (multiplayer)
-        if (!offline && roomId != null && localUid != null) {
-            FirestoreManager.getInstance().updatePlayerFinish(roomId, localUid, finishTimeMs,
+        // Ghi Firestore chỉ 1 lần (AtomicBoolean guard)
+        if (!offline && roomId != null && localUid != null && finishWritten.compareAndSet(false, true)) {
+            FirestoreManager.getInstance().updatePlayerFinish(
+                    roomId, localUid, finishTimeMs,
                     new FirestoreManager.OnCompleteCallback() {
                         @Override public void onSuccess() {}
                         @Override public void onFailure(String error) {}
                     });
         }
 
-        // Notify Activity
         if (eventListener != null) {
             post(() -> eventListener.onGameFinished(finishTimeMs));
         }
@@ -413,14 +458,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void render() {
         Canvas canvas = null;
+        SurfaceHolder holder = getHolder();
         try {
-            canvas = getHolder().lockCanvas();
-            if (canvas != null) {
-                draw(canvas);
-            }
+            canvas = holder.lockCanvas();
+            if (canvas != null) draw(canvas);
         } finally {
             if (canvas != null) {
-                getHolder().unlockCanvasAndPost(canvas);
+                try { holder.unlockCanvasAndPost(canvas); }
+                catch (IllegalStateException ignored) {}
             }
         }
     }
@@ -428,128 +473,78 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-
-        // Background
         canvas.drawColor(0xFF0A0A14);
 
         if (maze == null || localBall == null) return;
 
-        // Draw maze
-        mazeRenderer.draw(canvas, mazeOffsetX, mazeOffsetY, cellSize);
-
-        // Draw goal (blinking effect)
-        drawGoal(canvas);
-
-        // Draw remote players
-        drawRemotePlayers(canvas);
-
-        // Draw local ball
-        drawLocalBall(canvas);
-
-        // Draw HUD
-        drawHUD(canvas);
-
-        // Draw freeze overlay nếu đang bị freeze
-        if (localBall.isFrozen(System.currentTimeMillis())) {
-            canvas.drawRect(0, 0, getWidth(), getHeight(), freezeOverlayPaint);
-            canvas.drawText("❄️ FROZEN", getWidth() / 2f, getHeight() / 2f, textPaint);
-        }
-    }
-
-    private void drawGoal(Canvas canvas) {
-        // Blinking effect
-        long time = System.currentTimeMillis();
-        float alpha = (float) (0.5 + 0.5 * Math.sin(time * 0.006));
-        goalPaint.setAlpha((int) (alpha * 180));
-
-        float goalRadius = cellSize * 0.45f;
-        canvas.drawCircle(goalCenterX, goalCenterY, goalRadius, goalPaint);
-
-        // Goal glow
-        goalPaint.setAlpha((int) (alpha * 80));
-        canvas.drawCircle(goalCenterX, goalCenterY, goalRadius * 1.3f, goalPaint);
-    }
-
-    private void drawRemotePlayers(Canvas canvas) {
-        for (PlayerState ps : remotePlayers.values()) {
-            if (ps.getFinishTime() > 0) continue; // Đã về đích
-
-            float rx = ps.getX();
-            float ry = ps.getY();
-
-            // Validate position
-            if (rx > 0 && ry > 0) {
-                canvas.drawCircle(rx, ry, localBall.radius * 0.9f, remoteBallPaint);
-            }
-        }
-    }
-
-    private void drawLocalBall(Canvas canvas) {
         long nowMs = System.currentTimeMillis();
 
-        // Boost glow effect
-        if (localBall.isBoosted(nowMs)) {
-            canvas.drawCircle(localBall.x, localBall.y, localBall.radius * 1.5f, boostGlowPaint);
+        // Maze (renderer xử lý goal nhấp nháy bên trong)
+        mazeRenderer.draw(canvas, mazeOffsetX, mazeOffsetY, cellSize, nowMs);
+
+        // Remote players
+        for (PlayerState ps : remotePlayers.values()) {
+            if (ps.getFinishTime() > 0) continue;
+            float rx = ps.getX(), ry = ps.getY();
+            if (rx > 0 && ry > 0) {
+                canvas.drawCircle(rx, ry, localBall.radius * 0.9f, remoteBallPaint);
+                // Tên đối thủ
+                canvas.drawText(
+                        ps.getDisplayName() != null ? ps.getDisplayName() : "?",
+                        rx, ry - localBall.radius - 6f, remoteNamePaint);
+            }
         }
 
+        // Local ball
+        if (localBall.isBoosted(nowMs)) {
+            canvas.drawCircle(localBall.x, localBall.y, localBall.radius * 1.6f, boostGlowPaint);
+        }
         canvas.drawCircle(localBall.x, localBall.y, localBall.radius, ballPaint);
+
+        // HUD
+        drawHUD(canvas, nowMs);
+
+        // Freeze overlay
+        if (localBall.isFrozen(nowMs)) {
+            canvas.drawRect(0, 0, getWidth(), getHeight(), freezeOverlayPaint);
+            canvas.drawText("❄ FROZEN", getWidth() / 2f, getHeight() / 2f, textPaint);
+        }
     }
 
-    private void drawHUD(Canvas canvas) {
+    private void drawHUD(Canvas canvas, long nowMs) {
         // Timer
-        long elapsed = isFinished ? finishTimeMs : (System.currentTimeMillis() - gameStartTimeMs);
-        String timeStr = formatTime(elapsed);
-        canvas.drawText(timeStr, getWidth() / 2f, 80, textPaint);
+        long elapsed = isFinished ? finishTimeMs : (nowMs - gameStartTimeMs);
+        canvas.drawText(formatTime(elapsed), getWidth() / 2f, 72, hudTimerPaint);
 
-        // Skill cooldown indicator
-        float cooldownProgress = skillController.getCooldownProgress();
-        if (cooldownProgress < 1f) {
-            Paint cooldownPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            cooldownPaint.setColor(0xFF666666);
-            cooldownPaint.setStyle(Paint.Style.STROKE);
-            cooldownPaint.setStrokeWidth(8f);
-
-            float cx = 80, cy = 80, radius = 30;
-            canvas.drawCircle(cx, cy, radius, cooldownPaint);
-
-            cooldownPaint.setColor(0xFF00F5FF);
-            RectF arcRect = new RectF(cx - radius, cy - radius, cx + radius, cy + radius);
-            canvas.drawArc(arcRect, -90, 360 * cooldownProgress, false, cooldownPaint);
+        // Skill cooldown ring
+        float cx = 72f, cy = 72f, r = 28f;
+        float progress = skillController.getCooldownProgress();
+        canvas.drawCircle(cx, cy, r, cooldownTrackPaint);
+        if (progress < 1f) {
+            RectF arc = new RectF(cx - r, cy - r, cx + r, cy + r);
+            canvas.drawArc(arc, -90f, 360f * progress, false, cooldownArcPaint);
         } else {
-            // Skill ready indicator
-            Paint readyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            readyPaint.setColor(0xFF00FF88);
-            readyPaint.setTextSize(32f);
-            readyPaint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText("⚡", 80, 90, readyPaint);
+            canvas.drawText("Z", cx, cy + 10f, cooldownReadyPaint);
         }
 
         // Player count (multiplayer)
         if (!offline) {
-            Paint playerCountPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            playerCountPaint.setColor(0xFFFFFFFF);
-            playerCountPaint.setTextSize(32f);
-            playerCountPaint.setTextAlign(Paint.Align.RIGHT);
-            int count = remotePlayers.size() + 1;
-            canvas.drawText("👥 " + count, getWidth() - 40, 80, playerCountPaint);
+            int total = remotePlayers.size() + 1;
+            canvas.drawText("x" + total, getWidth() - 24f, 72f, playerCountPaint);
         }
     }
 
     private String formatTime(long ms) {
-        long s = ms / 1000;
-        long m = s / 60;
-        s = s % 60;
-        long millis = (ms % 1000) / 100;
-        return String.format(java.util.Locale.US, "%02d:%02d.%01d", m, s, millis);
+        long s  = ms / 1000;
+        long m  = s / 60;
+        s       = s % 60;
+        long cs = (ms % 1000) / 100;
+        return String.format(java.util.Locale.US, "%02d:%02d.%01d", m, s, cs);
     }
 
-    // ─── Cleanup ─────────────────────────────────────────────────────────
-
     public void cleanup() {
-        isRunning = false;
+        stopGameThread();
         syncManager.stop();
-        if (playersListener != null) {
-            playersListener.remove();
-        }
+        if (playersListener != null) playersListener.remove();
     }
 }

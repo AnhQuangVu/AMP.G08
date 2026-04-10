@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.ampg08.databinding.ItemScoreBinding;
 import com.example.ampg08.model.ScoreModel;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHolder> {
@@ -13,7 +14,13 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHol
     private final List<ScoreModel> scores;
 
     public ScoreAdapter(List<ScoreModel> scores) {
-        this.scores = scores;
+        this.scores = new ArrayList<>(scores);
+    }
+
+    public void submitList(List<ScoreModel> newScores) {
+        scores.clear();
+        scores.addAll(newScores);
+        notifyDataSetChanged();
     }
 
     @NonNull

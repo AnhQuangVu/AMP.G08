@@ -25,17 +25,21 @@ public class HomeActivity extends BaseActivity {
         setupClickListeners();
         animateMenu();
     }
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadUserInfo();
+    }
     private void loadUserInfo() {
         String uid = authManager.getCurrentUid();
         if (uid == null) return;
         FirestoreManager.getInstance().getUser(uid, user -> {
             if (user != null) {
                 binding.tvUsername.setText(user.getDisplayName());
-                binding.tvStats.setText(user.getTotalWins() + " thắng / " + user.getTotalMatches() + " trận");
+                binding.tvStats.setText(getString(R.string.home_stats_format, user.getTotalWins(), user.getTotalMatches()));
             } else {
                 binding.tvUsername.setText(authManager.getCurrentDisplayName());
-                binding.tvStats.setText("0 thắng / 0 trận");
+                binding.tvStats.setText(R.string.home_stats_default);
             }
         });
     }
@@ -48,6 +52,10 @@ public class HomeActivity extends BaseActivity {
         binding.btnJoin.setOnClickListener(v ->
                 startActivity(new Intent(this, JoinRoomActivity.class)));
 
+        // Match setup flow
+        binding.btnMatchSetup.setOnClickListener(v ->
+                startActivity(new Intent(this, PlaySetupActivity.class)));
+
         // Offline Practice
         binding.btnPractice.setOnClickListener(v -> {
             Intent intent = new Intent(this, GameActivity.class);
@@ -57,6 +65,12 @@ public class HomeActivity extends BaseActivity {
         });
 
         // Nhánh phụ
+        binding.btnScore.setOnClickListener(v ->
+                startActivity(new Intent(this, ScoreActivity.class)));
+
+        binding.btnSettings.setOnClickListener(v ->
+                startActivity(new Intent(this, SettingsActivity.class)));
+
         binding.btnProfile.setOnClickListener(v ->
                 startActivity(new Intent(this, ProfileActivity.class)));
 
@@ -73,7 +87,8 @@ public class HomeActivity extends BaseActivity {
 
     private void animateMenu() {
         View[] buttons = {
-                binding.btnCreate, binding.btnJoin, binding.btnPractice,
+                binding.btnCreate, binding.btnJoin, binding.btnMatchSetup, binding.btnPractice,
+                binding.btnScore, binding.btnSettings,
                 binding.btnLeaderboard, binding.btnProfile
         };
         long delay = 150;

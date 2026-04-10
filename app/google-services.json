@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "195163954777",
+    "firebase_url": "https://app-tilt-arena-default-rtdb.firebaseio.com",
     "project_id": "app-tilt-arena",
     "storage_bucket": "app-tilt-arena.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.ampg08"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "195163954777-1ak8onksovh9fe0gfghr7u81fueo1f4r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ampg08",
+            "certificate_hash": "20b4385bef63655f58361fe4551dc6e6de241eea"
+          }
+        },
+        {
+          "client_id": "195163954777-6fb0p5bfn6up1t642b2q3pk4iuqrv01v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCuGC3bYNG0x8cOWaBWXk0VdHydp5u9XzY"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "195163954777-6fb0p5bfn6up1t642b2q3pk4iuqrv01v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
