@@ -79,9 +79,11 @@ public class HomeActivity extends BaseActivity {
 
         // Sign Out
         binding.btnLogout.setOnClickListener(v -> {
-            authManager.signOut(this);
-            startActivity(new Intent(this, LoginActivity.class)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            binding.btnLogout.setEnabled(false);
+            authManager.signOut(this, getString(R.string.default_web_client_id), () -> {
+                startActivity(new Intent(this, LoginActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            });
         });
     }
 

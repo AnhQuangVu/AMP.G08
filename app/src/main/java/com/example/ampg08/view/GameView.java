@@ -21,6 +21,7 @@ import com.example.ampg08.model.PlayerState;
 import com.example.ampg08.sync.PositionSyncManager;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,6 +34,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float MAX_DT        = 0.05f; // tránh physics jump
     private static final long REMOTE_PLAYER_STALE_MS = 1500L;
     private static final float MAP_COORD_INVALID = -1f;
+    private static final float REMOTE_SMOOTH_ALPHA = 0.28f;
+    private static final float REMOTE_SNAP_DISTANCE_PX = 140f;
 
     // ─── Game State ──────────────────────────────────────────────────────
     private Thread           gameThread;
@@ -63,6 +66,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private boolean offline = true;
 
     private final Map<String, PlayerState> remotePlayers    = new ConcurrentHashMap<>();
+    private final Map<String, RemoteRenderState> remoteRenderStates = new ConcurrentHashMap<>();
     private       ListenerRegistration     playersListener;
     private       PositionSyncManager      syncManager;
 
@@ -95,6 +99,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     public interface GameEventListener {
         void onGameFinished(long finishTimeMs);
         void onSkillUsed();
+    }
+
+    private static class RemoteRenderState {
+        float renderX;
+        float renderY;
+        long lastSeenAtMs;
+        boolean initialized;
     }
 
     // ─── Constructors ────────────────────────────────────────────────────
@@ -339,6 +350,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
             remotePlayers.clear();
             remotePlayers.putAll(latestRemote);
+            remoteRenderStates.keySet().retainAll(new HashSet<>(latestRemote.keySet()));
         });
 
         syncManager.start(roomId, localUid, new PositionSyncManager.PositionProvider() {
@@ -500,16 +512,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         mazeRenderer.draw(canvas, mazeOffsetX, mazeOffsetY, cellSize, nowMs);
 
         // Remote players
-        for (PlayerState ps : remotePlayers.values()) {
+        for (Map.Entry<String, PlayerState> entry : remotePlayers.entrySet()) {
+            String uid = entry.getKey();
+            PlayerState ps = entry.getValue();
             if (ps.getFinishTime() > 0) continue;
             float rx = resolveRemoteX(ps);
             float ry = resolveRemoteY(ps);
             if (rx > 0 && ry > 0) {
-                canvas.drawCircle(rx, ry, localBall.radius * 0.9f, remoteBallPaint);
+                RemoteRenderState rs = smoothRemote(uid, rx, ry, nowMs);
+                canvas.drawCircle(rs.renderX, rs.renderY, localBall.radius * 0.9f, remoteBallPaint);
                 // Tên đối thủ
                 canvas.drawText(
                         ps.getDisplayName() != null ? ps.getDisplayName() : "?",
-                        rx, ry - localBall.radius - 6f, remoteNamePaint);
+                        rs.renderX, rs.renderY - localBall.radius - 6f, remoteNamePaint);
             }
         }
 
@@ -594,6 +609,32 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return ps.getY();
     }
 
+    private RemoteRenderState smoothRemote(String uid, float targetX, float targetY, long nowMs) {
+        RemoteRenderState state = remoteRenderStates.computeIfAbsent(uid, key -> new RemoteRenderState());
+
+        if (!state.initialized || nowMs - state.lastSeenAtMs > REMOTE_PLAYER_STALE_MS * 2L) {
+            state.renderX = targetX;
+            state.renderY = targetY;
+            state.initialized = true;
+        } else {
+            float dx = targetX - state.renderX;
+            float dy = targetY - state.renderY;
+            float distSq = dx * dx + dy * dy;
+
+            // Snap when opponent teleports/re-syncs to avoid visible trailing artifact.
+            if (distSq > REMOTE_SNAP_DISTANCE_PX * REMOTE_SNAP_DISTANCE_PX) {
+                state.renderX = targetX;
+                state.renderY = targetY;
+            } else {
+                state.renderX += dx * REMOTE_SMOOTH_ALPHA;
+                state.renderY += dy * REMOTE_SMOOTH_ALPHA;
+            }
+        }
+
+        state.lastSeenAtMs = nowMs;
+        return state;
+    }
+
     private float clamp01(float value) {
         return Math.max(0f, Math.min(1f, value));
     }
@@ -610,5 +651,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         stopGameThread();
         syncManager.stop();
         if (playersListener != null) playersListener.remove();
+        remotePlayers.clear();
+        remoteRenderStates.clear();
     }
 }

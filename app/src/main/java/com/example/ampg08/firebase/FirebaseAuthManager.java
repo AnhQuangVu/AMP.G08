@@ -27,6 +27,11 @@ public class FirebaseAuthManager {
     private static FirebaseAuthManager instance;
     private final FirebaseAuth auth;
     private GoogleSignInClient googleSignInClient;
+    private String cachedWebClientId;
+
+    public interface AuthOperationCallback {
+        void onComplete();
+    }
 
     private FirebaseAuthManager() {
         auth = FirebaseAuth.getInstance();
@@ -54,15 +59,24 @@ public class FirebaseAuthManager {
     }
 
     public void initGoogleSignIn(Activity activity, String webClientId) {
-        if (TextUtils.isEmpty(webClientId) || webClientId.contains("YOUR_WEB_CLIENT_ID")) {
+        googleSignInClient = ensureGoogleSignInClient(activity, webClientId);
+    }
+
+    private GoogleSignInClient ensureGoogleSignInClient(Activity activity, String webClientId) {
+        String resolvedWebClientId = !TextUtils.isEmpty(webClientId) ? webClientId : cachedWebClientId;
+        if (TextUtils.isEmpty(resolvedWebClientId) || resolvedWebClientId.contains("YOUR_WEB_CLIENT_ID")) {
             throw new IllegalArgumentException("default_web_client_id is invalid or not configured");
         }
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(webClientId)
-                .requestEmail()
-                .build();
-        googleSignInClient = GoogleSignIn.getClient(activity, gso);
+        cachedWebClientId = resolvedWebClientId;
+        if (googleSignInClient == null) {
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(resolvedWebClientId)
+                    .requestEmail()
+                    .build();
+            googleSignInClient = GoogleSignIn.getClient(activity, gso);
+        }
+        return googleSignInClient;
     }
 
     public boolean isGooglePlayServicesAvailable(Activity activity) {
@@ -81,6 +95,16 @@ public class FirebaseAuthManager {
         return googleSignInClient.getSignInIntent();
     }
 
+    /**
+     * Clear Google session before launching sign-in so account picker can show another account.
+     */
+    public void clearGoogleSessionForPicker(Activity activity, String webClientId, AuthOperationCallback callback) {
+        GoogleSignInClient client = ensureGoogleSignInClient(activity, webClientId);
+        client.signOut().addOnCompleteListener(activity, task -> {
+            if (callback != null) callback.onComplete();
+        });
+    }
+
     public Task<com.google.firebase.auth.AuthResult> firebaseAuthWithGoogle(GoogleSignInAccount account) {
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         return auth.signInWithCredential(credential);
@@ -93,9 +117,20 @@ public class FirebaseAuthManager {
 
     public void signOut(Activity activity) {
         auth.signOut();
-        if (googleSignInClient != null) {
-            googleSignInClient.signOut();
+
+        GoogleSignInClient client = googleSignInClient;
+        if (client == null) {
+            client = GoogleSignIn.getClient(activity, GoogleSignInOptions.DEFAULT_SIGN_IN);
         }
+        client.signOut();
+    }
+
+    public void signOut(Activity activity, String webClientId, AuthOperationCallback callback) {
+        auth.signOut();
+        GoogleSignInClient client = ensureGoogleSignInClient(activity, webClientId);
+        client.signOut().addOnCompleteListener(activity, task -> {
+            if (callback != null) callback.onComplete();
+        });
     }
 
     public String mapGoogleSignInError(ApiException e) {

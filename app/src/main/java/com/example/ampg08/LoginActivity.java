@@ -81,8 +81,13 @@ public class LoginActivity extends BaseActivity {
 
         try {
             setLoading(true);
-            Intent signInIntent = authManager.getGoogleSignInIntent();
-            startActivityForResult(signInIntent, FirebaseAuthManager.RC_SIGN_IN);
+            authManager.clearGoogleSessionForPicker(
+                    this,
+                    getString(R.string.default_web_client_id),
+                    () -> {
+                        Intent signInIntent = authManager.getGoogleSignInIntent();
+                        startActivityForResult(signInIntent, FirebaseAuthManager.RC_SIGN_IN);
+                    });
         } catch (Exception e) {
             setLoading(false);
             Log.e(TAG, "Cannot launch Google Sign-In", e);
