@@ -239,19 +239,17 @@ public class FirestoreManager {
 
     /**
      * Cập nhật vị trí bóng — không có callback vì được gọi 10 lần/giây.
-     * Lỗi sẽ được retry tự động bởi PositionSyncManager.
+     * Lỗi chỉ log cảnh báo để tránh crash từ callback bất đồng bộ.
      */
     public void updatePlayerPosition(String roomId, String uid, float x, float y) {
         Map<String, Object> data = new HashMap<>();
         data.put("x", x);
         data.put("y", y);
+        data.put("updatedAt", System.currentTimeMillis());
         db.collection(COL_ROOMS).document(roomId)
                 .collection(COL_PLAYERS).document(uid)
                 .update(data)
-                .addOnFailureListener(e -> {
-                    // Ném exception để PositionSyncManager biết và retry
-                    throw new RuntimeException("updatePosition failed: " + e.getMessage());
-                });
+                .addOnFailureListener(e -> Log.w(TAG, "updatePlayerPosition failed", e));
     }
 
     public void updatePlayerFinish(String roomId, String uid, long finishTime,
@@ -454,3 +452,4 @@ public class FirestoreManager {
         void onResult(List<String> uids);
     }
 }
+

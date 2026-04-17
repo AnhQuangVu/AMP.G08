@@ -11,7 +11,6 @@ import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
 
-import com.example.ampg08.firebase.FirebaseAuthManager;
 import com.example.ampg08.firebase.FirestoreManager;
 import com.example.ampg08.game.Ball;
 import com.example.ampg08.game.CollisionDetector;
@@ -22,7 +21,6 @@ import com.example.ampg08.model.PlayerState;
 import com.example.ampg08.sync.PositionSyncManager;
 import com.google.firebase.firestore.ListenerRegistration;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,6 +31,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final int   TARGET_FPS    = 60;
     private static final long  FRAME_TIME_NS = 1_000_000_000L / TARGET_FPS;
     private static final float MAX_DT        = 0.05f; // tránh physics jump
+    private static final long REMOTE_PLAYER_STALE_MS = 1500L;
 
     // ─── Game State ──────────────────────────────────────────────────────
     private Thread           gameThread;
@@ -263,12 +262,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
      * SkillController đã có cooldown — không cần guard thêm ở ngoài.
      */
     public void onProximityTriggered() {
+        if (localBall == null || isFinished || isPaused) return;
+
         if (skillController.canUseSkill()) {
+            long nowMs = System.currentTimeMillis();
             skillController.activateSkill();
-            localBall.activateBoost(System.currentTimeMillis());
+            localBall.activateBoost(nowMs, skillController.getBoostDuration());
 
             if (!offline) {
-                freezeNearestOpponent();
+                freezeNearestOpponent(nowMs);
             }
 
             if (eventListener != null) {
@@ -277,23 +279,26 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
     }
 
-    private void freezeNearestOpponent() {
-        if (remotePlayers.isEmpty() || roomId == null) return;
+    private void freezeNearestOpponent(long nowMs) {
+        if (remotePlayers.isEmpty() || roomId == null || localBall == null) return;
 
         String nearestUid = null;
-        float  minDistSq  = Float.MAX_VALUE;
+        float minDistSq = Float.MAX_VALUE;
 
         for (Map.Entry<String, PlayerState> entry : remotePlayers.entrySet()) {
             if (entry.getKey().equals(localUid)) continue;
             PlayerState ps = entry.getValue();
-            if (ps.getFinishTime() > 0) continue; // đã về đích
+            if (ps == null) continue;
+            if (ps.getFinishTime() > 0) continue; // Da ve dich.
+            if (ps.getX() <= 0f || ps.getY() <= 0f) continue; // Chua co vi tri hop le.
+            if (nowMs - ps.getUpdatedAt() > REMOTE_PLAYER_STALE_MS) continue; // Du lieu stale.
 
             float dx = ps.getX() - localBall.x;
             float dy = ps.getY() - localBall.y;
             float dSq = dx * dx + dy * dy;
 
             if (dSq < minDistSq) {
-                minDistSq  = dSq;
+                minDistSq = dSq;
                 nearestUid = entry.getKey();
             }
         }
@@ -311,19 +316,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         playersListener = FirestoreManager.getInstance().listenPlayers(roomId, players -> {
             if (players == null) return;
 
+            Map<String, PlayerState> latestRemote = new ConcurrentHashMap<>();
             for (PlayerState ps : players) {
                 if (ps.getUid() == null) continue;
 
                 if (!ps.getUid().equals(localUid)) {
-                    remotePlayers.put(ps.getUid(), ps);
+                    latestRemote.put(ps.getUid(), ps);
                 } else {
-                    // Kiểm tra freeze command cho local player
+                    // Kiem tra freeze command cho local player.
                     if (ps.isFreezeRequested()) {
-                        localBall.applyFreeze(System.currentTimeMillis());
+                        if (localBall != null) {
+                            localBall.applyFreeze(System.currentTimeMillis(), skillController.getFreezeDuration());
+                        }
                         FirestoreManager.getInstance().clearFreezeFlag(roomId, localUid);
                     }
                 }
             }
+
+            remotePlayers.clear();
+            remotePlayers.putAll(latestRemote);
         });
 
         syncManager.start(roomId, localUid, new PositionSyncManager.PositionProvider() {

@@ -65,7 +65,7 @@ service cloud.firestore {
         && request.resource.data.uid == uid
         && request.resource.data.displayName == resource.data.displayName
         && request.resource.data.diff(resource.data).changedKeys().hasOnly([
-          'x', 'y', 'ready', 'finishTime', 'freezeRequested'
+          'x', 'y', 'ready', 'finishTime', 'freezeRequested', 'updatedAt'
         ]);
     }
 
@@ -78,6 +78,7 @@ service cloud.firestore {
         && request.resource.data.y == resource.data.y
         && request.resource.data.ready == resource.data.ready
         && request.resource.data.finishTime == resource.data.finishTime
+        && request.resource.data.updatedAt == resource.data.updatedAt
         && resource.data.freezeRequested == false
         && request.resource.data.freezeRequested == true;
     }
@@ -168,4 +169,3 @@ service cloud.firestore {
     }
   }
 }
-

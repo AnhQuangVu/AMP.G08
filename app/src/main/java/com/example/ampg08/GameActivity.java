@@ -28,6 +28,7 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
     private Sensor proximitySensor;
     private Dialog pauseDialog;
     private boolean keepPausedOnResume;
+    private boolean proximityIsNear;
 
     private String  roomId;
     private long    mapSeed;
@@ -95,6 +96,7 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
     @Override
     protected void onPause() {
         super.onPause();
+        proximityIsNear = false;
         setGamePaused(true);
     }
 
@@ -115,11 +117,14 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
             binding.gameView.updateTilt(event.values[0], event.values[1]);
 
         } else if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
-            // Skill cooldown được quản lý hoàn toàn bởi SkillController trong GameView
-            // KHÔNG có double-cooldown ở Activity nữa
-            if (event.values[0] < proximitySensor.getMaximumRange()) {
+            if (proximitySensor == null) return;
+
+            // Trigger skill once per FAR -> NEAR transition.
+            boolean isNear = event.values[0] < proximitySensor.getMaximumRange();
+            if (isNear && !proximityIsNear) {
                 binding.gameView.onProximityTriggered();
             }
+            proximityIsNear = isNear;
         }
     }
 

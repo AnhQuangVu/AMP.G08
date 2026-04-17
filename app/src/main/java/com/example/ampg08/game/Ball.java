@@ -23,14 +23,14 @@ public class Ball {
     public boolean isBoosted(long nowMs) {
         return boosted && nowMs < boostUntilMs;
     }
-    public void activateBoost(long nowMs) {
+    public void activateBoost(long nowMs, long durationMs) {
         boosted = true;
-        boostUntilMs = nowMs + 2000L;
+        boostUntilMs = nowMs + Math.max(0L, durationMs);
     }
 
-    public void applyFreeze(long nowMs) {
+    public void applyFreeze(long nowMs, long durationMs) {
         frozen = true;
-        frozenUntilMs = nowMs + 3000L;
+        frozenUntilMs = nowMs + Math.max(0L, durationMs);
     }
 
     public boolean isFrozen(long nowMs) {

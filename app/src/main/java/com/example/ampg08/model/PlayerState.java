@@ -8,6 +8,7 @@ public class PlayerState {
     private boolean ready;
     private long finishTime;
     private boolean freezeRequested;
+    private long updatedAt;
 
     public PlayerState() {}
 
@@ -19,6 +20,7 @@ public class PlayerState {
         this.ready = false;
         this.finishTime = 0;
         this.freezeRequested = false;
+        this.updatedAt = System.currentTimeMillis();
     }
 
     // Getters
@@ -29,6 +31,7 @@ public class PlayerState {
     public boolean isReady() { return ready; }
     public long getFinishTime() { return finishTime; }
     public boolean isFreezeRequested() { return freezeRequested; }
+    public long getUpdatedAt() { return updatedAt; }
 
     // Setters
     public void setUid(String uid) { this.uid = uid; }
@@ -38,4 +41,5 @@ public class PlayerState {
     public void setReady(boolean ready) { this.ready = ready; }
     public void setFinishTime(long finishTime) { this.finishTime = finishTime; }
     public void setFreezeRequested(boolean freezeRequested) { this.freezeRequested = freezeRequested; }
+    public void setUpdatedAt(long updatedAt) { this.updatedAt = updatedAt; }
 }
