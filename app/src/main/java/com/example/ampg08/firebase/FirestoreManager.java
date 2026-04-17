@@ -241,10 +241,12 @@ public class FirestoreManager {
      * Cập nhật vị trí bóng — không có callback vì được gọi 10 lần/giây.
      * Lỗi chỉ log cảnh báo để tránh crash từ callback bất đồng bộ.
      */
-    public void updatePlayerPosition(String roomId, String uid, float x, float y) {
+    public void updatePlayerPosition(String roomId, String uid, float x, float y, float mapX, float mapY) {
         Map<String, Object> data = new HashMap<>();
         data.put("x", x);
         data.put("y", y);
+        data.put("mapX", mapX);
+        data.put("mapY", mapY);
         data.put("updatedAt", System.currentTimeMillis());
         db.collection(COL_ROOMS).document(roomId)
                 .collection(COL_PLAYERS).document(uid)

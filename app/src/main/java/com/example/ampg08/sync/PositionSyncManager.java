@@ -24,6 +24,8 @@ public class PositionSyncManager {
     public interface PositionProvider {
         float getX();
         float getY();
+        float getMapX();
+        float getMapY();
     }
 
     public void start(String roomId, String uid, PositionProvider provider, boolean offline) {
@@ -44,7 +46,9 @@ public class PositionSyncManager {
 
                 try {
                     RoomService.getInstance().updatePlayerPosition(
-                            roomId, uid, provider.getX(), provider.getY());
+                            roomId, uid,
+                            provider.getX(), provider.getY(),
+                            provider.getMapX(), provider.getMapY());
                     errorCount = 0; // reset khi thành công
                 } catch (Exception e) {
                     errorCount++;

@@ -32,6 +32,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final long  FRAME_TIME_NS = 1_000_000_000L / TARGET_FPS;
     private static final float MAX_DT        = 0.05f; // tránh physics jump
     private static final long REMOTE_PLAYER_STALE_MS = 1500L;
+    private static final float MAP_COORD_INVALID = -1f;
 
     // ─── Game State ──────────────────────────────────────────────────────
     private Thread           gameThread;
@@ -290,11 +291,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             PlayerState ps = entry.getValue();
             if (ps == null) continue;
             if (ps.getFinishTime() > 0) continue; // Da ve dich.
-            if (ps.getX() <= 0f || ps.getY() <= 0f) continue; // Chua co vi tri hop le.
-            if (nowMs - ps.getUpdatedAt() > REMOTE_PLAYER_STALE_MS) continue; // Du lieu stale.
+            if (ps.getUpdatedAt() > 0 && nowMs - ps.getUpdatedAt() > REMOTE_PLAYER_STALE_MS) continue; // Du lieu stale.
 
-            float dx = ps.getX() - localBall.x;
-            float dy = ps.getY() - localBall.y;
+            float rx = resolveRemoteX(ps);
+            float ry = resolveRemoteY(ps);
+            if (rx <= 0f || ry <= 0f) continue;
+
+            float dx = rx - localBall.x;
+            float dy = ry - localBall.y;
             float dSq = dx * dx + dy * dy;
 
             if (dSq < minDistSq) {
@@ -340,6 +344,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         syncManager.start(roomId, localUid, new PositionSyncManager.PositionProvider() {
             @Override public float getX() { return localBall != null ? localBall.x : 0; }
             @Override public float getY() { return localBall != null ? localBall.y : 0; }
+            @Override public float getMapX() { return localBall != null ? toMapX(localBall.x) : MAP_COORD_INVALID; }
+            @Override public float getMapY() { return localBall != null ? toMapY(localBall.y) : MAP_COORD_INVALID; }
         }, offline);
     }
 
@@ -496,7 +502,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         // Remote players
         for (PlayerState ps : remotePlayers.values()) {
             if (ps.getFinishTime() > 0) continue;
-            float rx = ps.getX(), ry = ps.getY();
+            float rx = resolveRemoteX(ps);
+            float ry = resolveRemoteY(ps);
             if (rx > 0 && ry > 0) {
                 canvas.drawCircle(rx, ry, localBall.radius * 0.9f, remoteBallPaint);
                 // Tên đối thủ
@@ -543,6 +550,52 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             int total = remotePlayers.size() + 1;
             canvas.drawText("x" + total, getWidth() - 24f, 72f, playerCountPaint);
         }
+    }
+
+    private float toMapX(float screenX) {
+        if (mazeGenerator == null || cellSize <= 0f) return MAP_COORD_INVALID;
+        float mazeWidth = mazeGenerator.getCols() * cellSize;
+        if (mazeWidth <= 0f) return MAP_COORD_INVALID;
+        return clamp01((screenX - mazeOffsetX) / mazeWidth);
+    }
+
+    private float toMapY(float screenY) {
+        if (mazeGenerator == null || cellSize <= 0f) return MAP_COORD_INVALID;
+        float mazeHeight = mazeGenerator.getRows() * cellSize;
+        if (mazeHeight <= 0f) return MAP_COORD_INVALID;
+        return clamp01((screenY - mazeOffsetY) / mazeHeight);
+    }
+
+    private float fromMapX(float mapX) {
+        if (mazeGenerator == null || cellSize <= 0f) return MAP_COORD_INVALID;
+        float mazeWidth = mazeGenerator.getCols() * cellSize;
+        if (mazeWidth <= 0f) return MAP_COORD_INVALID;
+        return mazeOffsetX + clamp01(mapX) * mazeWidth;
+    }
+
+    private float fromMapY(float mapY) {
+        if (mazeGenerator == null || cellSize <= 0f) return MAP_COORD_INVALID;
+        float mazeHeight = mazeGenerator.getRows() * cellSize;
+        if (mazeHeight <= 0f) return MAP_COORD_INVALID;
+        return mazeOffsetY + clamp01(mapY) * mazeHeight;
+    }
+
+    private float resolveRemoteX(PlayerState ps) {
+        if (ps.getMapX() >= 0f && ps.getMapX() <= 1f) {
+            return fromMapX(ps.getMapX());
+        }
+        return ps.getX();
+    }
+
+    private float resolveRemoteY(PlayerState ps) {
+        if (ps.getMapY() >= 0f && ps.getMapY() <= 1f) {
+            return fromMapY(ps.getMapY());
+        }
+        return ps.getY();
+    }
+
+    private float clamp01(float value) {
+        return Math.max(0f, Math.min(1f, value));
     }
 
     private String formatTime(long ms) {

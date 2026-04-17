@@ -65,7 +65,7 @@ service cloud.firestore {
         && request.resource.data.uid == uid
         && request.resource.data.displayName == resource.data.displayName
         && request.resource.data.diff(resource.data).changedKeys().hasOnly([
-          'x', 'y', 'ready', 'finishTime', 'freezeRequested', 'updatedAt'
+          'x', 'y', 'mapX', 'mapY', 'ready', 'finishTime', 'freezeRequested', 'updatedAt'
         ]);
     }
 
@@ -76,6 +76,8 @@ service cloud.firestore {
         && request.resource.data.displayName == resource.data.displayName
         && request.resource.data.x == resource.data.x
         && request.resource.data.y == resource.data.y
+        && request.resource.data.mapX == resource.data.mapX
+        && request.resource.data.mapY == resource.data.mapY
         && request.resource.data.ready == resource.data.ready
         && request.resource.data.finishTime == resource.data.finishTime
         && request.resource.data.updatedAt == resource.data.updatedAt

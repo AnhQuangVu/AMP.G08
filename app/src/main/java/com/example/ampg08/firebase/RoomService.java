@@ -13,8 +13,8 @@ public class RoomService {
         return instance;
     }
 
-    public void updatePlayerPosition(String roomId, String uid, float x, float y) {
-        FirestoreManager.getInstance().updatePlayerPosition(roomId, uid, x, y);
+    public void updatePlayerPosition(String roomId, String uid, float x, float y, float mapX, float mapY) {
+        FirestoreManager.getInstance().updatePlayerPosition(roomId, uid, x, y, mapX, mapY);
     }
 
     public void updatePlayerFinished(String roomId, String uid, long finishTime,
