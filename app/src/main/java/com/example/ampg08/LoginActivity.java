@@ -81,13 +81,8 @@ public class LoginActivity extends BaseActivity {
 
         try {
             setLoading(true);
-            authManager.clearGoogleSessionForPicker(
-                    this,
-                    getString(R.string.default_web_client_id),
-                    () -> {
-                        Intent signInIntent = authManager.getGoogleSignInIntent();
-                        startActivityForResult(signInIntent, FirebaseAuthManager.RC_SIGN_IN);
-                    });
+            Intent signInIntent = authManager.getGoogleSignInIntent();
+            startActivityForResult(signInIntent, FirebaseAuthManager.RC_SIGN_IN);
         } catch (Exception e) {
             setLoading(false);
             Log.e(TAG, "Cannot launch Google Sign-In", e);
@@ -103,7 +98,15 @@ public class LoginActivity extends BaseActivity {
         if (requestCode == FirebaseAuthManager.RC_SIGN_IN) {
             if (resultCode != RESULT_OK || data == null) {
                 setLoading(false);
-                Toast.makeText(this, "Bạn đã hủy đăng nhập Google", Toast.LENGTH_SHORT).show();
+                if (data != null) {
+                    Task<GoogleSignInAccount> t = GoogleSignIn.getSignedInAccountFromIntent(data);
+                    try { t.getResult(ApiException.class); }
+                    catch (ApiException ex) {
+                        Toast.makeText(this, "GG error code=" + ex.getStatusCode(), Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                }
+                Toast.makeText(this, "GG canceled (no data)", Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -134,8 +137,7 @@ public class LoginActivity extends BaseActivity {
             } catch (ApiException e) {
                 setLoading(false);
                 Log.e(TAG, "Google Sign-In failed, code=" + e.getStatusCode(), e);
-                String message = authManager.mapGoogleSignInError(e) + " (code " + e.getStatusCode() + ")";
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "ApiException code=" + e.getStatusCode(), Toast.LENGTH_LONG).show();
             }
         }
     }

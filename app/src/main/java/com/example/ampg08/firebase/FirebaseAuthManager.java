@@ -69,13 +69,11 @@ public class FirebaseAuthManager {
         }
 
         cachedWebClientId = resolvedWebClientId;
-        if (googleSignInClient == null) {
-            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(resolvedWebClientId)
-                    .requestEmail()
-                    .build();
-            googleSignInClient = GoogleSignIn.getClient(activity, gso);
-        }
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(resolvedWebClientId)
+                .requestEmail()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(activity, gso);
         return googleSignInClient;
     }
 
