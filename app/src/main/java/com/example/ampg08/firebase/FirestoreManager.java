@@ -55,6 +55,10 @@ public class FirestoreManager {
         return instance;
     }
 
+    public FirebaseFirestore getDb() {
+        return db;
+    }
+
     // ─── USERS ──────────────────────────────────────────────────────────
 
     public void createUser(User user, OnCompleteCallback callback) {
@@ -498,6 +502,11 @@ public class FirestoreManager {
                 data.put("waitingUid", uid);
                 data.put("waitingName", displayName);
                 data.put("roomId", "");
+                data.put("player1", "");
+                data.put("player2", "");
+                data.put("player1Name", "");
+                data.put("player2Name", "");
+                data.put("mapSeed", 0L); // Reset seed về 0 để đánh dấu chưa có trận
                 data.put("updatedAt", System.currentTimeMillis());
                 tx.set(poolRef, data);
             } else {
@@ -536,8 +545,11 @@ public class FirestoreManager {
                 .addSnapshotListener((snap, e) -> {
                     if (e != null || snap == null) return;
                     String roomId  = snap.getString("roomId");
+                    String p1      = snap.getString("player1");
+                    String p2      = snap.getString("player2");
                     long   mapSeed = snap.getLong("mapSeed") != null ? snap.getLong("mapSeed") : 0L;
-                    callback.onUpdate(roomId, mapSeed);
+                    long updatedAt = snap.getLong("updatedAt") != null ? snap.getLong("updatedAt") : 0L;
+                    callback.onUpdate(roomId, p1, p2, mapSeed, updatedAt);
                 });
     }
 
@@ -564,7 +576,7 @@ public class FirestoreManager {
     }
 
     public interface OnMatchmakingPoolCallback {
-        void onUpdate(String roomId, long mapSeed);
+        void onUpdate(String roomId, String p1, String p2, long mapSeed, long updatedAt);
     }
 
     public interface OnLeaderboardCallback {

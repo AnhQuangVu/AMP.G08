@@ -39,11 +39,14 @@ public class MatchmakingActivity extends BaseActivity {
         startMatchmaking();
     }
 
+    private long searchStartTime;
+
     private void startMatchmaking() {
         String uid  = auth.getCurrentUid();
         String name = auth.getCurrentDisplayName();
         if (uid == null) { finish(); return; }
 
+        searchStartTime = System.currentTimeMillis();
         setStatus("Đang tìm trận...");
         db.joinMatchmakingPool(uid, name, new FirestoreManager.OnMatchmakingCallback() {
             @Override
@@ -60,9 +63,20 @@ public class MatchmakingActivity extends BaseActivity {
     }
 
     private void listenForMatch() {
-        poolListener = db.listenMatchmakingPool((roomId, mapSeed) -> {
-            if (roomId != null && !roomId.isEmpty()) {
-                setupAndLaunch(roomId, mapSeed);
+        String myUid = auth.getCurrentUid();
+        // Lấy thêm trường updatedAt từ callback (cần cập nhật FirestoreManager)
+        poolListener = db.listenMatchmakingPool((roomId, p1, p2, mapSeed, updatedAt) -> {
+            // CHỈ VÀO TRẬN KHI:
+            // 1. Có đủ thông tin trận đấu
+            // 2. Trận đấu này được tạo SAU KHI mình bắt đầu tìm (tránh trận cũ)
+            if (roomId != null && !roomId.isEmpty() && 
+                p1 != null && !p1.isEmpty() && 
+                p2 != null && !p2.isEmpty() &&
+                mapSeed > 0 && updatedAt >= searchStartTime) {
+                
+                if (myUid != null && (myUid.equals(p1) || myUid.equals(p2))) {
+                    setupAndLaunch(roomId, mapSeed);
+                }
             }
         });
     }
