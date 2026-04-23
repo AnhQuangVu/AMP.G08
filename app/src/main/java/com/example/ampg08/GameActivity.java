@@ -147,6 +147,12 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
             pauseDialog.dismiss();
         }
         binding.gameView.cleanup();
+
+        // --- Rời phòng trên Firestore khi thoát Activity ---
+        String uid = com.example.ampg08.firebase.FirebaseAuthManager.getInstance().getCurrentUid();
+        if (roomId != null && uid != null) {
+            com.example.ampg08.firebase.FirestoreManager.getInstance().leaveRoom(roomId, uid, null);
+        }
     }
 
     // ─── Sensor Events ───────────────────────────────────────────────────

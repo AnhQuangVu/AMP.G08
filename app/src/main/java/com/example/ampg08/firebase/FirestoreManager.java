@@ -218,6 +218,24 @@ public class FirestoreManager {
                 });
     }
 
+    public void leaveRoom(String roomId, String uid, OnCompleteCallback callback) {
+        if (roomId == null || uid == null) return;
+        // 1. Remove UID from 'players' array in room document
+        db.collection(COL_ROOMS).document(roomId)
+                .update("players", com.google.firebase.firestore.FieldValue.arrayRemove(uid))
+                .addOnCompleteListener(task -> {
+                    // 2. Delete player state sub-document
+                    db.collection(COL_ROOMS).document(roomId)
+                            .collection(COL_PLAYERS).document(uid)
+                            .delete();
+                    
+                    if (callback != null) {
+                        if (task.isSuccessful()) callback.onSuccess();
+                        else callback.onFailure("Failed to leave room");
+                    }
+                });
+    }
+
     public ListenerRegistration listenRoom(String roomId, OnRoomCallback callback) {
         return db.collection(COL_ROOMS).document(roomId)
                 .addSnapshotListener((snap, e) -> {

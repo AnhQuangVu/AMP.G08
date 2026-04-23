@@ -472,6 +472,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         localBall.update(tiltX, tiltY, dt, nowMs);
         collisionDetector.resolve(localBall);
+
+        // --- HARD CLAMP: Giữ bóng bên trong Maze ---
+        float minX = mazeOffsetX + localBall.radius;
+        float maxX = mazeOffsetX + (mazeGenerator.getCols() * cellSize) - localBall.radius;
+        float minY = mazeOffsetY + localBall.radius;
+        float maxY = mazeOffsetY + (mazeGenerator.getRows() * cellSize) - localBall.radius;
+
+        if (localBall.x < minX) localBall.x = minX;
+        if (localBall.x > maxX) localBall.x = maxX;
+        if (localBall.y < minY) localBall.y = minY;
+        if (localBall.y > maxY) localBall.y = maxY;
+
         skillController.update(nowMs);
 
         // Check goal
