@@ -489,15 +489,9 @@ public class FirestoreManager {
 
             String waitingUid     = snap.getString("waitingUid");
             String waitingName    = snap.getString("waitingName");
-            String existingRoomId = snap.getString("roomId");
-
-            // Pool đã matched rồi (edge case) → bỏ qua
-            if (existingRoomId != null && !existingRoomId.isEmpty()) {
-                return null;
-            }
 
             if (waitingUid == null || waitingUid.isEmpty() || waitingUid.equals(uid)) {
-                // Pool trống hoặc chính mình → ghi vào chờ
+                // Pool trống hoặc chính mình → ghi vào chờ và RESET sạch sẽ
                 Map<String, Object> data = new HashMap<>();
                 data.put("waitingUid", uid);
                 data.put("waitingName", displayName);
@@ -506,7 +500,7 @@ public class FirestoreManager {
                 data.put("player2", "");
                 data.put("player1Name", "");
                 data.put("player2Name", "");
-                data.put("mapSeed", 0L); // Reset seed về 0 để đánh dấu chưa có trận
+                data.put("mapSeed", 0L);
                 data.put("updatedAt", System.currentTimeMillis());
                 tx.set(poolRef, data);
             } else {
@@ -515,7 +509,6 @@ public class FirestoreManager {
                 DocumentReference roomRef = db.collection(COL_ROOMS).document();
                 String newRoomId = roomRef.getId();
 
-                // hostUid = uid (người đang chạy transaction) để pass rule create
                 Room room = new Room(newRoomId, uid, seed);
                 room.getPlayers().add(waitingUid);
                 tx.set(roomRef, room);
@@ -528,6 +521,7 @@ public class FirestoreManager {
                 poolData.put("player2", uid);
                 poolData.put("player2Name", displayName);
                 poolData.put("waitingUid", "");
+                // Dùng thời gian hiện tại của hệ thống để khớp với searchStartTime
                 poolData.put("updatedAt", System.currentTimeMillis());
                 tx.set(poolRef, poolData);
             }

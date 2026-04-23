@@ -64,11 +64,11 @@ public class MatchmakingActivity extends BaseActivity {
 
     private void listenForMatch() {
         String myUid = auth.getCurrentUid();
-        // Lấy thêm trường updatedAt từ callback (cần cập nhật FirestoreManager)
         poolListener = db.listenMatchmakingPool((roomId, p1, p2, mapSeed, updatedAt) -> {
             // CHỈ VÀO TRẬN KHI:
-            // 1. Có đủ thông tin trận đấu
-            // 2. Trận đấu này được tạo SAU KHI mình bắt đầu tìm (tránh trận cũ)
+            // 1. Đầy đủ thông tin: roomId, p1, p2, mapSeed > 0
+            // 2. Quan trọng: updatedAt phải lớn hơn hoặc bằng searchStartTime (tránh đọc cache cũ)
+            // 3. Mình là 1 trong 2 người
             if (roomId != null && !roomId.isEmpty() && 
                 p1 != null && !p1.isEmpty() && 
                 p2 != null && !p2.isEmpty() &&

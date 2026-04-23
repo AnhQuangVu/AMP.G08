@@ -95,11 +95,14 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
         if (offline) {
             binding.gameView.setupOffline(mapSeed);
         } else {
-            // Lấy tên từ Firestore để đồng bộ với tên đã đổi trong Profile
+            // Khởi tạo ngay lập tức với mapSeed và roomId để tránh lỗi vị trí bóng
+            binding.gameView.setupGame(mapSeed, roomId, uid != null ? uid : "local", fallbackName);
+            
+            // Cập nhật tên thật sau (nếu có) — chỉ set tên, không regenerate maze/listener
             FirestoreManager.getInstance().getUser(uid, user -> {
-                String name = (user != null && user.getDisplayName() != null)
-                        ? user.getDisplayName() : fallbackName;
-                binding.gameView.setupGame(mapSeed, roomId, uid != null ? uid : "local", name);
+                if (user != null && user.getDisplayName() != null) {
+                    binding.gameView.setLocalDisplayName(user.getDisplayName());
+                }
             });
         }
     }

@@ -243,7 +243,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     public void computeLayout() {
         int width  = getWidth();
         int height = getHeight();
-        if (width == 0 || height == 0 || maze == null) return;
+        // CHỈ thực hiện khi có đủ kích thước màn hình và mê cung đã được tạo
+        if (width <= 0 || height <= 0 || mazeGenerator == null || maze == null) {
+            localBall = null; // Đảm bảo không có bóng ma khi chưa có map
+            return;
+        }
 
         int rows = mazeGenerator.getRows();
         int cols = mazeGenerator.getCols();
@@ -260,16 +264,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         mazeOffsetX = (width  - mazeWidth)  / 2f;
         mazeOffsetY = (height - mazeHeight) / 2f + hudHeight / 2f;
 
+        // Tính toán tọa độ xuất phát dựa trên MazeGenerator
         float startX = mazeOffsetX + (mazeGenerator.getStartCol() + 0.5f) * cellSize;
         float startY = mazeOffsetY + (mazeGenerator.getStartRow() + 0.5f) * cellSize;
         float ballRadius = cellSize * 0.32f;
 
-        localBall = new Ball(startX, startY, ballRadius);
+        // Chỉ khởi tạo Ball nếu tọa độ hợp lệ
+        if (startX > mazeOffsetX && startY > mazeOffsetY) {
+            localBall = new Ball(startX, startY, ballRadius);
+        }
 
         goalCenterX = mazeOffsetX + (mazeGenerator.getGoalCol() + 0.5f) * cellSize;
         goalCenterY = mazeOffsetY + (mazeGenerator.getGoalRow() + 0.5f) * cellSize;
 
-        collisionDetector.setLayout(mazeOffsetX, mazeOffsetY, cellSize);
+        if (collisionDetector != null) {
+            collisionDetector.setLayout(mazeOffsetX, mazeOffsetY, cellSize);
+        }
 
         gameStartTimeMs = System.currentTimeMillis();
         finishWritten.set(false);
@@ -383,9 +393,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
-        if (maze == null) setupOffline(System.currentTimeMillis());
+        // Không tự động setupOffline ở đây nữa để tránh ghi đè map online
         computeLayout();
-        isRunning = false; // reset trước khi start
+        isRunning = false;
         startGameThread();
     }
 
@@ -467,7 +477,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void update(float dt) {
-        if (localBall == null) return;
+        // CHỈ chạy update khi mọi thứ đã sẵn sàng
+        if (localBall == null || mazeGenerator == null || cellSize <= 0) return;
         long nowMs = System.currentTimeMillis();
 
         localBall.update(tiltX, tiltY, dt, nowMs);
@@ -688,6 +699,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         s       = s % 60;
         long cs = (ms % 1000) / 100;
         return String.format(java.util.Locale.US, "%02d:%02d.%01d", m, s, cs);
+    }
+
+    public void setLocalDisplayName(String name) {
+        if (name != null) this.localDisplayName = name;
     }
 
     public void cleanup() {
