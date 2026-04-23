@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:text="Beginner Maze"
-            android:textSize="14sp"
+            android:textSize="@dimen/text_size_label"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/difficultyContainer" />
 

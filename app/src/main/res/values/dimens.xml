@@ -21,6 +21,7 @@
     <dimen name="main_button_width">260dp</dimen>
 
     <dimen name="map_card_width">140dp</dimen>
+    <dimen name="mode_card_min_height">120dp</dimen>
     <dimen name="map_card_height">180dp</dimen>
 
     <dimen name="icon_md">24dp</dimen>
@@ -28,7 +29,10 @@
 
     <!-- Typography -->
     <dimen name="text_size_title">32sp</dimen>
+    <dimen name="text_size_heading">28sp</dimen>
     <dimen name="text_size_subtitle">20sp</dimen>
+    <dimen name="text_size_body_lg">18sp</dimen>
     <dimen name="text_size_body">16sp</dimen>
+    <dimen name="text_size_label">14sp</dimen>
     <dimen name="text_size_caption">12sp</dimen>
 </resources>

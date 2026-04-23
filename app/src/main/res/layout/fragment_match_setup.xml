@@ -45,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/label_players"
-                android:textSize="13sp"
+                android:textSize="@dimen/text_size_caption"
                 android:textColor="@color/color_text_secondary"
                 android:fontFamily="@font/rajdhani"
                 android:letterSpacing="0.2"
@@ -62,7 +62,7 @@
                     android:id="@+id/btn2Players"
                     style="@style/ButtonStyle.Neon.Large"
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
+                    android:layout_height="@dimen/button_height"
                     android:layout_weight="1"
                     android:text="2"
                     android:layout_marginEnd="8dp" />
@@ -71,7 +71,7 @@
                     android:id="@+id/btn3Players"
                     style="@style/ButtonStyle.Neon"
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
+                    android:layout_height="@dimen/button_height"
                     android:layout_weight="1"
                     android:text="3"
                     android:layout_marginEnd="8dp" />
@@ -80,7 +80,7 @@
                     android:id="@+id/btn4Players"
                     style="@style/ButtonStyle.Neon"
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
+                    android:layout_height="@dimen/button_height"
                     android:layout_weight="1"
                     android:text="4" />
 
@@ -100,7 +100,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/label_ai_difficulty"
-                android:textSize="13sp"
+                android:textSize="@dimen/text_size_caption"
                 android:textColor="@color/color_text_secondary"
                 android:fontFamily="@font/rajdhani"
                 android:letterSpacing="0.2"
@@ -116,7 +116,7 @@
                     android:id="@+id/btnAiEasy"
                     style="@style/ButtonStyle.Neon.Large"
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
+                    android:layout_height="@dimen/button_height"
                     android:layout_weight="1"
                     android:text="@string/ai_easy"
                     android:textColor="@color/color_diff_easy"
@@ -126,7 +126,7 @@
                     android:id="@+id/btnAiNormal"
                     style="@style/ButtonStyle.Neon"
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
+                    android:layout_height="@dimen/button_height"
                     android:layout_weight="1"
                     android:text="@string/ai_normal"
                     android:layout_marginEnd="8dp" />
@@ -135,7 +135,7 @@
                     android:id="@+id/btnAiHard"
                     style="@style/ButtonStyle.Neon"
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
+                    android:layout_height="@dimen/button_height"
                     android:layout_weight="1"
                     android:text="@string/ai_hard"
                     android:textColor="@color/color_diff_hard" />
@@ -148,7 +148,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_time_limit"
-            android:textSize="13sp"
+            android:textSize="@dimen/text_size_caption"
             android:textColor="@color/color_text_secondary"
             android:fontFamily="@font/rajdhani"
             android:letterSpacing="0.2"
@@ -171,7 +171,7 @@
                 android:textColor="@color/color_text_primary"
                 android:buttonTint="@color/color_primary"
                 android:fontFamily="@font/rajdhani"
-                android:textSize="13sp" />
+                android:textSize="@dimen/text_size_caption" />
 
             <RadioButton
                 android:id="@+id/rb3Min"
@@ -182,7 +182,7 @@
                 android:textColor="@color/color_text_primary"
                 android:buttonTint="@color/color_primary"
                 android:fontFamily="@font/rajdhani"
-                android:textSize="13sp"
+                android:textSize="@dimen/text_size_caption"
                 android:checked="true" />
 
             <RadioButton
@@ -194,7 +194,7 @@
                 android:textColor="@color/color_text_primary"
                 android:buttonTint="@color/color_primary"
                 android:fontFamily="@font/rajdhani"
-                android:textSize="13sp" />
+                android:textSize="@dimen/text_size_caption" />
 
             <RadioButton
                 android:id="@+id/rbNoLimit"
@@ -205,7 +205,7 @@
                 android:textColor="@color/color_text_primary"
                 android:buttonTint="@color/color_primary"
                 android:fontFamily="@font/rajdhani"
-                android:textSize="13sp" />
+                android:textSize="@dimen/text_size_caption" />
 
         </RadioGroup>
 

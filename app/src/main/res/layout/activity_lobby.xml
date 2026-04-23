@@ -9,6 +9,7 @@
     <ImageButton android:id="@+id/btnBack"
         android:layout_width="48dp" android:layout_height="48dp"
         android:src="@android:drawable/ic_media_previous"
+        android:contentDescription="Back"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:tint="@color/color_primary"
         app:layout_constraintTop_toTopOf="parent"
@@ -17,7 +18,7 @@
 
     <TextView android:id="@+id/tvRoomCode"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="ROOM: ..." android:textSize="16sp"
+        android:text="ROOM: ..." android:textSize="@dimen/text_size_body"
         android:textColor="@color/color_text_hint" android:fontFamily="@font/rajdhani"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,7 +26,7 @@
 
     <TextView android:id="@+id/tvWaiting"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="Chờ mọi người sẵn sàng..." android:textSize="14sp"
+        android:text="Chờ mọi người sẵn sàng..." android:textSize="@dimen/text_size_label"
         android:textColor="@color/color_primary" android:fontFamily="@font/rajdhani"
         app:layout_constraintTop_toBottomOf="@id/btnBack"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,7 +44,7 @@
 
     <Button android:id="@+id/btnReady"
         style="@style/ButtonStyle.Neon"
-        android:layout_width="0dp" android:layout_height="52dp"
+        android:layout_width="0dp" android:layout_height="@dimen/button_height"
         android:text="READY"
         app:layout_constraintBottom_toTopOf="@id/btnStart"
         app:layout_constraintStart_toStartOf="parent"
@@ -53,7 +54,7 @@
 
     <Button android:id="@+id/btnStart"
         style="@style/ButtonStyle.Neon.Orange"
-        android:layout_width="0dp" android:layout_height="52dp"
+        android:layout_width="0dp" android:layout_height="@dimen/button_height"
         android:text="▶ START GAME"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"

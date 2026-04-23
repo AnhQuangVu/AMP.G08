@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0 W"
-                android:textSize="18sp"
+                android:textSize="@dimen/text_size_body_lg"
                 android:textColor="@color/color_secondary"
                 android:fontFamily="@font/orbitron" />
 
@@ -56,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0 games"
-                android:textSize="12sp"
+                android:textSize="@dimen/text_size_caption"
                 android:textColor="@color/color_text_hint"
                 android:fontFamily="@font/rajdhani" />
         </LinearLayout>

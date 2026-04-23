@@ -9,11 +9,13 @@ import com.example.ampg08.model.User;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -444,6 +446,107 @@ public class FirestoreManager {
 
     public interface OnPlayersCallback {
         void onPlayers(List<PlayerState> players);
+    }
+
+    // ─── MATCHMAKING ────────────────────────────────────────────────────
+
+    private static final String COL_MATCHMAKING = "matchmaking";
+    private static final String DOC_POOL        = "pool";
+
+    /**
+     * Tham gia hàng chờ ghép trận.
+     * - Nếu pool trống: ghi uid vào, chờ người thứ 2.
+     * - Nếu pool đã có người: lấy uid đó, tạo phòng cho cả 2, ghi roomId vào pool.
+     * Dùng transaction để tránh race condition.
+     */
+    public void joinMatchmakingPool(String uid, String displayName, OnMatchmakingCallback callback) {
+        DocumentReference poolRef = db.collection(COL_MATCHMAKING).document(DOC_POOL);
+
+        db.runTransaction((Transaction.Function<Void>) tx -> {
+            DocumentSnapshot snap = tx.get(poolRef);
+
+            String waitingUid     = snap.getString("waitingUid");
+            String waitingName    = snap.getString("waitingName");
+            String existingRoomId = snap.getString("roomId");
+
+            // Pool đã matched rồi (edge case) → bỏ qua
+            if (existingRoomId != null && !existingRoomId.isEmpty()) {
+                return null;
+            }
+
+            if (waitingUid == null || waitingUid.isEmpty() || waitingUid.equals(uid)) {
+                // Pool trống hoặc chính mình → ghi vào chờ
+                Map<String, Object> data = new HashMap<>();
+                data.put("waitingUid", uid);
+                data.put("waitingName", displayName);
+                data.put("roomId", "");
+                data.put("updatedAt", System.currentTimeMillis());
+                tx.set(poolRef, data);
+            } else {
+                // Có người chờ → tạo phòng và match
+                long seed = System.currentTimeMillis();
+                DocumentReference roomRef = db.collection(COL_ROOMS).document();
+                String newRoomId = roomRef.getId();
+
+                // hostUid = uid (người đang chạy transaction) để pass rule create
+                Room room = new Room(newRoomId, uid, seed);
+                room.getPlayers().add(waitingUid);
+                tx.set(roomRef, room);
+
+                Map<String, Object> poolData = new HashMap<>();
+                poolData.put("roomId", newRoomId);
+                poolData.put("mapSeed", seed);
+                poolData.put("player1", waitingUid);
+                poolData.put("player1Name", waitingName);
+                poolData.put("player2", uid);
+                poolData.put("player2Name", displayName);
+                poolData.put("waitingUid", "");
+                poolData.put("updatedAt", System.currentTimeMillis());
+                tx.set(poolRef, poolData);
+            }
+            return null;
+        }).addOnSuccessListener(v -> callback.onJoined())
+          .addOnFailureListener(e -> {
+              Log.e(TAG, "joinMatchmakingPool failed", e);
+              callback.onError(e.getMessage());
+          });
+    }
+
+    /** Lắng nghe pool để biết khi nào được match. */
+    public ListenerRegistration listenMatchmakingPool(OnMatchmakingPoolCallback callback) {
+        return db.collection(COL_MATCHMAKING).document(DOC_POOL)
+                .addSnapshotListener((snap, e) -> {
+                    if (e != null || snap == null) return;
+                    String roomId  = snap.getString("roomId");
+                    long   mapSeed = snap.getLong("mapSeed") != null ? snap.getLong("mapSeed") : 0L;
+                    callback.onUpdate(roomId, mapSeed);
+                });
+    }
+
+    /** Rời hàng chờ (khi hủy). */
+    public void leaveMatchmakingPool(String uid) {
+        DocumentReference poolRef = db.collection(COL_MATCHMAKING).document(DOC_POOL);
+        db.runTransaction((Transaction.Function<Void>) tx -> {
+            DocumentSnapshot snap = tx.get(poolRef);
+            String waitingUid = snap.getString("waitingUid");
+            if (uid.equals(waitingUid)) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("waitingUid", "");
+                data.put("waitingName", "");
+                data.put("roomId", "");
+                tx.set(poolRef, data);
+            }
+            return null;
+        }).addOnFailureListener(e -> Log.w(TAG, "leaveMatchmakingPool failed", e));
+    }
+
+    public interface OnMatchmakingCallback {
+        void onJoined();
+        void onError(String error);
+    }
+
+    public interface OnMatchmakingPoolCallback {
+        void onUpdate(String roomId, long mapSeed);
     }
 
     public interface OnLeaderboardCallback {

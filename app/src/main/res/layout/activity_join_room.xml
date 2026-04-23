@@ -10,6 +10,7 @@
     <ImageButton android:id="@+id/btnBack"
         android:layout_width="48dp" android:layout_height="48dp"
         android:src="@android:drawable/ic_media_previous"
+        android:contentDescription="Back"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:tint="@color/color_primary"
         app:layout_constraintTop_toTopOf="parent"
@@ -17,7 +18,7 @@
 
     <TextView android:id="@+id/tvTitle"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="JOIN ROOM" android:textSize="28sp"
+        android:text="JOIN ROOM" android:textSize="@dimen/text_size_heading"
         android:textColor="@color/color_primary" android:fontFamily="@font/orbitron"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/btnBack"
@@ -46,12 +47,12 @@
             android:inputType="textNoSuggestions"
             android:textColor="@color/color_secondary"
             android:fontFamily="@font/orbitron"
-            android:textSize="18sp" android:letterSpacing="0.1" />
+            android:textSize="@dimen/text_size_body_lg" android:letterSpacing="0.1" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button android:id="@+id/btnJoin"
         style="@style/ButtonStyle.Neon.Orange"
-        android:layout_width="0dp" android:layout_height="56dp"
+        android:layout_width="0dp" android:layout_height="@dimen/button_height"
         android:text="JOIN ROOM →"
         app:layout_constraintTop_toBottomOf="@id/tilRoomCode"
         app:layout_constraintStart_toStartOf="parent"

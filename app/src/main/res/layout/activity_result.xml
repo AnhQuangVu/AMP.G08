@@ -9,7 +9,7 @@
 
     <TextView android:id="@+id/tvResult"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="RESULT" android:textSize="16sp"
+        android:text="RESULT" android:textSize="@dimen/text_size_body"
         android:textColor="@color/color_text_hint" android:fontFamily="@font/rajdhani"
         android:letterSpacing="0.3"
         app:layout_constraintTop_toTopOf="parent"
@@ -30,7 +30,7 @@
 
     <TextView android:id="@+id/tvSubtitle"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="wins the race!" android:textSize="16sp"
+        android:text="wins the race!" android:textSize="@dimen/text_size_body"
         android:textColor="@color/color_primary" android:fontFamily="@font/rajdhani"
         app:layout_constraintTop_toBottomOf="@id/tvWinner"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +40,7 @@
     <TextView android:id="@+id/tvTimeLbl"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:text="YOUR TIME"
-        android:textSize="13sp" android:textColor="@color/color_text_hint"
+        android:textSize="@dimen/text_size_caption" android:textColor="@color/color_text_hint"
         android:fontFamily="@font/rajdhani" android:letterSpacing="0.2"
         app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
         app:layout_constraintStart_toStartOf="parent"
@@ -70,13 +70,13 @@
         android:layout_marginTop="24dp">
 
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="LEADERBOARD" android:textSize="13sp"
+            android:text="LEADERBOARD" android:textSize="@dimen/text_size_caption"
             android:textColor="@color/color_text_hint" android:fontFamily="@font/rajdhani"
             android:letterSpacing="0.2" android:layout_marginBottom="8dp" />
 
         <TextView android:id="@+id/tvRanking"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="" android:textSize="16sp"
+            android:text="" android:textSize="@dimen/text_size_body"
             android:textColor="@color/color_text_primary" android:fontFamily="@font/rajdhani"
             android:lineSpacingMultiplier="1.6" />
     </LinearLayout>
@@ -92,13 +92,13 @@
 
         <Button android:id="@+id/btnPlayAgain"
             style="@style/ButtonStyle.Neon"
-            android:layout_width="match_parent" android:layout_height="52dp"
+            android:layout_width="match_parent" android:layout_height="@dimen/button_height"
             android:text="▶ PLAY AGAIN"
             android:layout_marginBottom="10dp" />
 
         <Button android:id="@+id/btnHome"
             style="@style/ButtonStyle.Neon.Orange"
-            android:layout_width="match_parent" android:layout_height="52dp"
+            android:layout_width="match_parent" android:layout_height="@dimen/button_height"
             android:text="⌂ HOME" />
     </LinearLayout>
 

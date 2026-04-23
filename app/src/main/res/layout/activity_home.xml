@@ -32,7 +32,7 @@
 
             <ImageView
                 android:layout_width="52dp"
-                android:layout_height="52dp"
+                android:layout_height="@dimen/button_height"
                 android:src="@drawable/ic_profile"
                 android:contentDescription="@string/profile"
                 app:tint="@color/color_primary"
@@ -43,17 +43,18 @@
                 <TextView android:id="@+id/tvUsername"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:text="@string/home_player_default" android:textColor="@color/color_text_primary"
-                    android:textSize="18sp" android:fontFamily="@font/rajdhani" android:textStyle="bold" />
+                    android:textSize="@dimen/text_size_body_lg" android:fontFamily="@font/rajdhani" android:textStyle="bold" />
                 <TextView android:id="@+id/tvStats"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:text="@string/home_stats_default" android:textColor="@color/color_primary"
-                    android:textSize="13sp" android:fontFamily="@font/rajdhani" />
+                    android:textSize="@dimen/text_size_caption" android:fontFamily="@font/rajdhani" />
             </LinearLayout>
 
             <ImageButton android:id="@+id/btnLogout"
-                android:layout_width="36dp" android:layout_height="36dp"
+                android:layout_width="48dp" android:layout_height="48dp"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="12dp"
                 app:tint="@color/color_secondary"
                 android:contentDescription="@string/logout" />
         </LinearLayout>
@@ -74,34 +75,42 @@
     <!-- Buttons -->
     <LinearLayout
         android:id="@+id/menuButtons"
-        android:layout_width="300dp" android:layout_height="wrap_content"
+        android:layout_width="0dp" android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
         app:layout_constraintTop_toBottomOf="@id/tvTitleHome"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <Button android:id="@+id/btnCreate"
+        <Button android:id="@+id/btnQuickMatch"
             style="@style/ButtonStyle.Neon.Large"
-            android:layout_width="match_parent" android:layout_height="56dp"
+            android:layout_width="match_parent" android:layout_height="@dimen/button_height"
+            android:text="⚡ QUICK MATCH"
+            android:layout_marginBottom="12dp" />
+
+        <Button android:id="@+id/btnCreate"
+            style="@style/ButtonStyle.Neon"
+            android:layout_width="match_parent" android:layout_height="@dimen/button_height"
             android:text="@string/home_btn_create_room"
             android:layout_marginBottom="12dp" />
 
         <Button android:id="@+id/btnJoin"
             style="@style/ButtonStyle.Neon"
-            android:layout_width="match_parent" android:layout_height="52dp"
+            android:layout_width="match_parent" android:layout_height="@dimen/button_height"
             android:text="@string/home_btn_join_room"
             android:layout_marginBottom="12dp" />
 
         <Button android:id="@+id/btnPractice"
             style="@style/ButtonStyle.Neon"
-            android:layout_width="match_parent" android:layout_height="52dp"
+            android:layout_width="match_parent" android:layout_height="@dimen/button_height"
             android:text="@string/home_btn_practice"
             android:layout_marginBottom="12dp" />
 
         <Button android:id="@+id/btnMatchSetup"
             style="@style/ButtonStyle.Neon"
-            android:layout_width="match_parent" android:layout_height="52dp"
+            android:layout_width="match_parent" android:layout_height="@dimen/button_height"
             android:text="@string/home_btn_match_setup"
             android:layout_marginBottom="12dp" />
 
@@ -133,7 +142,7 @@
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal">
             <Button android:id="@+id/btnLeaderboard"
-                style="@style/ButtonStyle.Neon.Orange"
+                style="@style/ButtonStyle.Neon"
                 android:layout_width="0dp" android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="@null"

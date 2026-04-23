@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Tilt Arena</string>
+    <string name="app_name">AMP MAZE</string>
 
     <!-- Common -->
     <string name="loading">Đang tải...</string>
@@ -11,7 +11,7 @@
     <string name="pause">Tạm dừng</string>
 
     <!-- Main Activity -->
-    <string name="title_tilt">TILT</string>
+    <string name="title_tilt">AMP</string>
     <string name="title_arena">ARENA</string>
     <string name="menu_play">CHƠI</string>
     <string name="menu_score">ĐIỂM SỐ</string>
@@ -80,7 +80,7 @@
     <string name="practice">Luyện tập</string>
     <string name="leaderboard">Bảng xếp hạng</string>
     <string name="profile">Hồ sơ</string>
-    <string name="home_title">TILT ARENA</string>
+    <string name="home_title">AMP MAZE</string>
     <string name="home_player_default">Player</string>
     <string name="home_stats_default">0 thắng / 0 trận</string>
     <string name="home_stats_format">%1$d thắng / %2$d trận</string>

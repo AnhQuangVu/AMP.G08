@@ -36,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Player"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_size_body"
                 android:textColor="@color/color_text_primary"
                 android:fontFamily="@font/rajdhani"
                 android:textStyle="bold" />
@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="READY"
-            android:textSize="14sp"
+            android:textSize="@dimen/text_size_label"
             android:textColor="@color/color_diff_easy"
             android:fontFamily="@font/rajdhani"
             android:textStyle="bold" />

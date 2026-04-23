@@ -17,7 +17,7 @@
 
     <color name="color_text_primary">#FFFFFF</color>
     <color name="color_text_secondary">#E0E0E0</color>
-    <color name="color_text_hint">#808080</color>
+    <color name="color_text_hint">#9E9E9E</color>
 
     <color name="color_divider">#33FFFFFF</color>
     <color name="color_overlay">#80000000</color>

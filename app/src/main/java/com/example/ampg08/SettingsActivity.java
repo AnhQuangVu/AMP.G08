@@ -10,8 +10,6 @@ public class SettingsActivity extends BaseActivity {
 
     private static final String PREFS_NAME = "tilt_arena_settings";
     private static final String KEY_SENSITIVITY = "sensor_sensitivity";
-    private static final String KEY_MUSIC = "music";
-    private static final String KEY_SFX = "sfx";
     private static final String KEY_VIBRATION = "vibration";
 
     private static final int DEFAULT_SENSITIVITY = 5;
@@ -34,8 +32,6 @@ public class SettingsActivity extends BaseActivity {
     private void loadSettings() {
         android.content.SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         binding.sbSensitivity.setProgress(prefs.getInt(KEY_SENSITIVITY, DEFAULT_SENSITIVITY));
-        binding.swMusic.setChecked(prefs.getBoolean(KEY_MUSIC, true));
-        binding.swSFX.setChecked(prefs.getBoolean(KEY_SFX, true));
         binding.swVibration.setChecked(prefs.getBoolean(KEY_VIBRATION, true));
     }
 
@@ -57,8 +53,6 @@ public class SettingsActivity extends BaseActivity {
             }
         });
 
-        binding.swMusic.setOnCheckedChangeListener((buttonView, isChecked) -> saveBoolean(KEY_MUSIC, isChecked));
-        binding.swSFX.setOnCheckedChangeListener((buttonView, isChecked) -> saveBoolean(KEY_SFX, isChecked));
         binding.swVibration.setOnCheckedChangeListener((buttonView, isChecked) -> saveBoolean(KEY_VIBRATION, isChecked));
 
         binding.btnReset.setOnClickListener(v -> showResetDialog());
@@ -71,15 +65,11 @@ public class SettingsActivity extends BaseActivity {
                 .setNegativeButton(R.string.cancel, null)
                 .setPositiveButton(R.string.ok, (dialog, which) -> {
                     binding.sbSensitivity.setProgress(DEFAULT_SENSITIVITY);
-                    binding.swMusic.setChecked(true);
-                    binding.swSFX.setChecked(true);
                     binding.swVibration.setChecked(true);
 
                     getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                             .edit()
                             .putInt(KEY_SENSITIVITY, DEFAULT_SENSITIVITY)
-                            .putBoolean(KEY_MUSIC, true)
-                            .putBoolean(KEY_SFX, true)
                             .putBoolean(KEY_VIBRATION, true)
                             .apply();
 

@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -95,6 +97,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     // ─── Listener ────────────────────────────────────────────────────────
     private GameEventListener eventListener;
+    private GestureDetector gestureDetector;
 
     public interface GameEventListener {
         void onGameFinished(long finishTimeMs);
@@ -128,10 +131,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void init() {
         getHolder().addCallback(this);
         setFocusable(true);
-        setLayerType(LAYER_TYPE_HARDWARE, null); // hardware acceleration cho SurfaceView
+        setLayerType(LAYER_TYPE_HARDWARE, null);
         initPaints();
-        syncManager    = new PositionSyncManager();
+        syncManager     = new PositionSyncManager();
         skillController = new SkillController();
+        gestureDetector = new GestureDetector(getContext(),
+                new GestureDetector.SimpleOnGestureListener() {
+                    @Override
+                    public boolean onDoubleTap(MotionEvent e) {
+                        onProximityTriggered();
+                        return true;
+                    }
+                });
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        gestureDetector.onTouchEvent(event);
+        return true;
     }
 
     private void initPaints() {
@@ -333,10 +350,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
             Map<String, PlayerState> latestRemote = new ConcurrentHashMap<>();
             for (PlayerState ps : players) {
-                if (ps.getUid() == null) continue;
+                String psUid = ps.getUid();
+                if (psUid == null) continue;
 
-                if (!ps.getUid().equals(localUid)) {
-                    latestRemote.put(ps.getUid(), ps);
+                if (!psUid.equals(localUid)) {
+                    latestRemote.put(psUid, ps);
                 } else {
                     // Kiem tra freeze command cho local player.
                     if (ps.isFreezeRequested()) {
@@ -511,28 +529,27 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         // Maze (renderer xử lý goal nhấp nháy bên trong)
         mazeRenderer.draw(canvas, mazeOffsetX, mazeOffsetY, cellSize, nowMs);
 
-        // Remote players
+        // Local ball
+        if (localBall.isBoosted(nowMs)) {
+            canvas.drawCircle(localBall.x, localBall.y, localBall.radius * 1.6f, boostGlowPaint);
+        }
+        canvas.drawCircle(localBall.x, localBall.y, localBall.radius, ballPaint);
+
+        // Remote players (vẽ sau local để không bị che khuất khi cùng vị trí)
         for (Map.Entry<String, PlayerState> entry : remotePlayers.entrySet()) {
             String uid = entry.getKey();
             PlayerState ps = entry.getValue();
             if (ps.getFinishTime() > 0) continue;
             float rx = resolveRemoteX(ps);
             float ry = resolveRemoteY(ps);
-            if (rx > 0 && ry > 0) {
+            if (rx > MAP_COORD_INVALID && ry > MAP_COORD_INVALID) {
                 RemoteRenderState rs = smoothRemote(uid, rx, ry, nowMs);
-                canvas.drawCircle(rs.renderX, rs.renderY, localBall.radius * 0.9f, remoteBallPaint);
-                // Tên đối thủ
+                canvas.drawCircle(rs.renderX, rs.renderY, localBall.radius, remoteBallPaint);
                 canvas.drawText(
                         ps.getDisplayName() != null ? ps.getDisplayName() : "?",
                         rs.renderX, rs.renderY - localBall.radius - 6f, remoteNamePaint);
             }
         }
-
-        // Local ball
-        if (localBall.isBoosted(nowMs)) {
-            canvas.drawCircle(localBall.x, localBall.y, localBall.radius * 1.6f, boostGlowPaint);
-        }
-        canvas.drawCircle(localBall.x, localBall.y, localBall.radius, ballPaint);
 
         // HUD
         drawHUD(canvas, nowMs);
@@ -560,10 +577,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             canvas.drawText("Z", cx, cy + 10f, cooldownReadyPaint);
         }
 
-        // Player count (multiplayer)
+        // Player count + debug (multiplayer)
         if (!offline) {
             int total = remotePlayers.size() + 1;
-            canvas.drawText("x" + total, getWidth() - 24f, 72f, playerCountPaint);
+            canvas.drawText(total + "P", getWidth() - 24f, 72f, playerCountPaint);
+            // Debug: hiện số remote players và mapX của người đầu tiên
+            if (!remotePlayers.isEmpty()) {
+                PlayerState first = remotePlayers.values().iterator().next();
+                String dbg = String.format(java.util.Locale.US, "rx=%.2f ry=%.2f",
+                        first.getMapX(), first.getMapY());
+                canvas.drawText(dbg, getWidth() / 2f, 110f, playerCountPaint);
+            } else {
+                canvas.drawText("no remote", getWidth() / 2f, 110f, playerCountPaint);
+            }
         }
     }
 
@@ -596,17 +622,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private float resolveRemoteX(PlayerState ps) {
-        if (ps.getMapX() >= 0f && ps.getMapX() <= 1f) {
-            return fromMapX(ps.getMapX());
-        }
-        return ps.getX();
+        // Ưu tiên mapX (normalized, cross-device)
+        if (ps.getMapX() >= 0f && ps.getMapX() <= 1f) return fromMapX(ps.getMapX());
+        // Fallback: screen x (cùng màn hình)
+        if (ps.getX() > 0f) return ps.getX();
+        // Chưa sync → start position (cùng điểm bắt đầu)
+        if (mazeGenerator != null && cellSize > 0f)
+            return mazeOffsetX + (mazeGenerator.getStartCol() + 0.5f) * cellSize;
+        return MAP_COORD_INVALID;
     }
 
     private float resolveRemoteY(PlayerState ps) {
-        if (ps.getMapY() >= 0f && ps.getMapY() <= 1f) {
-            return fromMapY(ps.getMapY());
-        }
-        return ps.getY();
+        if (ps.getMapY() >= 0f && ps.getMapY() <= 1f) return fromMapY(ps.getMapY());
+        if (ps.getY() > 0f) return ps.getY();
+        if (mazeGenerator != null && cellSize > 0f)
+            return mazeOffsetY + (mazeGenerator.getStartRow() + 0.5f) * cellSize;
+        return MAP_COORD_INVALID;
     }
 
     private RemoteRenderState smoothRemote(String uid, float targetX, float targetY, long nowMs) {

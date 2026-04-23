@@ -61,7 +61,7 @@
                 android:progressTint="@color/color_primary"
                 android:thumbTint="@color/color_primary" />
 
-            <!-- Audio -->
+            <!-- Haptics -->
             <TextView
                 style="@style/TextStyle.Body"
                 android:layout_width="wrap_content"
@@ -69,27 +69,6 @@
                 android:text="@string/settings_audio_haptics"
                 android:textColor="@color/color_primary"
                 android:layout_marginTop="32dp" />
-
-            <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/swMusic"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/settings_music"
-                android:textColor="@color/white"
-                android:fontFamily="@font/rajdhani"
-                android:layout_marginTop="16dp"
-                app:thumbTint="@color/color_primary"
-                app:trackTint="@color/color_primary_glow" />
-
-            <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/swSFX"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/settings_sound_effects"
-                android:textColor="@color/white"
-                android:fontFamily="@font/rajdhani"
-                app:thumbTint="@color/color_primary"
-                app:trackTint="@color/color_primary_glow" />
 
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/swVibration"

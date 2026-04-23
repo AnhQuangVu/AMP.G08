@@ -22,7 +22,7 @@
 
         <TextView android:id="@+id/tvTitle"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="PROFILE" android:textSize="28sp"
+            android:text="PROFILE" android:textSize="@dimen/text_size_heading"
             android:textColor="@color/color_primary" android:fontFamily="@font/orbitron"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/btnBack"
@@ -76,7 +76,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Chạm để đổi ảnh"
-            android:textSize="12sp"
+            android:textSize="@dimen/text_size_caption"
             android:textColor="@color/color_text_hint"
             android:fontFamily="@font/rajdhani"
             app:layout_constraintTop_toBottomOf="@id/avatarContainer"
@@ -101,10 +101,10 @@
                     android:gravity="center" android:orientation="vertical">
                     <TextView android:id="@+id/tvWins"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="0" android:textSize="28sp"
+                        android:text="0" android:textSize="@dimen/text_size_heading"
                         android:textColor="@color/color_secondary" android:fontFamily="@font/orbitron" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="WINS" android:textSize="12sp"
+                        android:text="WINS" android:textSize="@dimen/text_size_caption"
                         android:textColor="@color/color_text_hint" android:fontFamily="@font/rajdhani" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -117,10 +117,10 @@
                     android:gravity="center" android:orientation="vertical">
                     <TextView android:id="@+id/tvMatches"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="0" android:textSize="28sp"
+                        android:text="0" android:textSize="@dimen/text_size_heading"
                         android:textColor="@color/color_primary" android:fontFamily="@font/orbitron" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="MATCHES" android:textSize="12sp"
+                        android:text="MATCHES" android:textSize="@dimen/text_size_caption"
                         android:textColor="@color/color_text_hint" android:fontFamily="@font/rajdhani" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -133,10 +133,10 @@
                     android:gravity="center" android:orientation="vertical">
                     <TextView android:id="@+id/tvWinRate"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="0%" android:textSize="28sp"
+                        android:text="0%" android:textSize="@dimen/text_size_heading"
                         android:textColor="@color/color_diff_easy" android:fontFamily="@font/orbitron" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="WIN RATE" android:textSize="12sp"
+                        android:text="WIN RATE" android:textSize="@dimen/text_size_caption"
                         android:textColor="@color/color_text_hint" android:fontFamily="@font/rajdhani" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -145,7 +145,7 @@
         <!-- Email -->
         <TextView android:id="@+id/tvEmail"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="" android:textSize="14sp"
+            android:text="" android:textSize="@dimen/text_size_label"
             android:textColor="@color/color_text_hint" android:fontFamily="@font/rajdhani"
             app:layout_constraintTop_toBottomOf="@id/statsRow"
             app:layout_constraintStart_toStartOf="parent"
@@ -173,7 +173,7 @@
 
         <Button android:id="@+id/btnSave"
             style="@style/ButtonStyle.Neon"
-            android:layout_width="0dp" android:layout_height="52dp"
+            android:layout_width="0dp" android:layout_height="@dimen/button_height"
             android:text="SAVE CHANGES"
             app:layout_constraintTop_toBottomOf="@id/tilName"
             app:layout_constraintStart_toStartOf="parent"

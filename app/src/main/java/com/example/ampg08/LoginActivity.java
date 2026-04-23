@@ -7,6 +7,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
 import com.example.ampg08.databinding.ActivityLoginBinding;
 import com.example.ampg08.firebase.FirebaseAuthManager;
 import com.example.ampg08.firebase.FirestoreManager;
@@ -25,6 +29,9 @@ public class LoginActivity extends BaseActivity {
 
     private ActivityLoginBinding binding;
     private FirebaseAuthManager authManager;
+
+    private final ActivityResultLauncher<Intent> googleSignInLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::handleGoogleSignInResult);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,15 +81,12 @@ public class LoginActivity extends BaseActivity {
 
     private void doGoogleSignIn() {
         if (!authManager.isGooglePlayServicesAvailable(this)) {
-            int status = authManager.getGooglePlayServicesStatus(this);
-            showGooglePlayServicesError(status);
+            showGooglePlayServicesError(authManager.getGooglePlayServicesStatus(this));
             return;
         }
-
         try {
             setLoading(true);
-            Intent signInIntent = authManager.getGoogleSignInIntent();
-            startActivityForResult(signInIntent, FirebaseAuthManager.RC_SIGN_IN);
+            googleSignInLauncher.launch(authManager.getGoogleSignInIntent());
         } catch (Exception e) {
             setLoading(false);
             Log.e(TAG, "Cannot launch Google Sign-In", e);
@@ -92,53 +96,48 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == FirebaseAuthManager.RC_SIGN_IN) {
-            if (resultCode != RESULT_OK || data == null) {
-                setLoading(false);
-                if (data != null) {
-                    Task<GoogleSignInAccount> t = GoogleSignIn.getSignedInAccountFromIntent(data);
-                    try { t.getResult(ApiException.class); }
-                    catch (ApiException ex) {
-                        Toast.makeText(this, "GG error code=" + ex.getStatusCode(), Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                }
-                Toast.makeText(this, "GG canceled (no data)", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                if (account == null || account.getIdToken() == null) {
-                    setLoading(false);
-                    Toast.makeText(this,
-                            "Không nhận được token Google. Vui lòng thử lại.",
-                            Toast.LENGTH_LONG).show();
+    private void handleGoogleSignInResult(ActivityResult result) {
+        if (result.getResultCode() != RESULT_OK || result.getData() == null) {
+            setLoading(false);
+            if (result.getData() != null) {
+                Task<GoogleSignInAccount> t = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                try { t.getResult(ApiException.class); }
+                catch (ApiException ex) {
+                    Toast.makeText(this, "GG error code=" + ex.getStatusCode(), Toast.LENGTH_LONG).show();
                     return;
                 }
-
-                setLoading(true);
-                authManager.firebaseAuthWithGoogle(account)
-                        .addOnSuccessListener(result -> {
-                            ensureUserDoc(result.getUser());
-                            goHome();
-                        })
-                        .addOnFailureListener(e -> {
-                            setLoading(false);
-                            Log.e(TAG, "Firebase auth with Google failed", e);
-                            Toast.makeText(this,
-                                    authManager.mapFirebaseGoogleAuthError(e),
-                                    Toast.LENGTH_LONG).show();
-                        });
-            } catch (ApiException e) {
-                setLoading(false);
-                Log.e(TAG, "Google Sign-In failed, code=" + e.getStatusCode(), e);
-                Toast.makeText(this, "ApiException code=" + e.getStatusCode(), Toast.LENGTH_LONG).show();
             }
+            Toast.makeText(this, "GG canceled (no data)", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+        try {
+            GoogleSignInAccount account = task.getResult(ApiException.class);
+            if (account == null || account.getIdToken() == null) {
+                setLoading(false);
+                Toast.makeText(this,
+                        "Không nhận được token Google. Vui lòng thử lại.",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+            setLoading(true);
+            authManager.firebaseAuthWithGoogle(account)
+                    .addOnSuccessListener(r -> {
+                        ensureUserDoc(r.getUser());
+                        goHome();
+                    })
+                    .addOnFailureListener(e -> {
+                        setLoading(false);
+                        Log.e(TAG, "Firebase auth with Google failed", e);
+                        Toast.makeText(this,
+                                authManager.mapFirebaseGoogleAuthError(e),
+                                Toast.LENGTH_LONG).show();
+                    });
+        } catch (ApiException e) {
+            setLoading(false);
+            Log.e(TAG, "Google Sign-In failed, code=" + e.getStatusCode(), e);
+            Toast.makeText(this, "ApiException code=" + e.getStatusCode(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -150,7 +149,6 @@ public class LoginActivity extends BaseActivity {
             GoogleApiAvailability.getInstance().getErrorDialog(this, status, 9002).show();
             return;
         }
-
         Toast.makeText(this,
                 "Thiết bị chưa hỗ trợ Google Play Services (code " + status + ")",
                 Toast.LENGTH_LONG).show();

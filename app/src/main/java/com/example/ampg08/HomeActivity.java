@@ -45,6 +45,10 @@ public class HomeActivity extends BaseActivity {
     }
 
     private void setupClickListeners() {
+        // Quick Match
+        binding.btnQuickMatch.setOnClickListener(v ->
+                startActivity(new Intent(this, MatchmakingActivity.class)));
+
         // Online Multiplayer
         binding.btnCreate.setOnClickListener(v ->
                 startActivity(new Intent(this, CreateRoomActivity.class)));
@@ -89,7 +93,7 @@ public class HomeActivity extends BaseActivity {
 
     private void animateMenu() {
         View[] buttons = {
-                binding.btnCreate, binding.btnJoin, binding.btnMatchSetup, binding.btnPractice,
+                binding.btnQuickMatch, binding.btnCreate, binding.btnJoin, binding.btnMatchSetup, binding.btnPractice,
                 binding.btnScore, binding.btnSettings,
                 binding.btnLeaderboard, binding.btnProfile
         };

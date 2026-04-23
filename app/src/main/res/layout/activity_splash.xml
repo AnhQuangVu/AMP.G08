@@ -40,7 +40,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TILT "
+                android:text="AMP "
                 android:textSize="44sp"
                 android:textColor="@color/color_primary"
                 android:textStyle="bold"
@@ -48,7 +48,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ARENA"
+                android:text="MAZE"
                 android:textSize="44sp"
                 android:textColor="@color/color_secondary"
                 android:textStyle="bold"
@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="INITIALIZING..."
-            android:textSize="14sp"
+            android:textSize="@dimen/text_size_label"
             android:textColor="@color/color_text_hint"
             android:fontFamily="@font/rajdhani"
             android:letterSpacing="0.3"

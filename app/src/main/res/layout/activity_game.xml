@@ -16,7 +16,7 @@
     <ImageButton
         android:id="@+id/btnPause"
         android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_height="@dimen/button_height"
         android:layout_gravity="top|end"
         android:layout_margin="16dp"
         android:background="@drawable/bg_neon_button"
