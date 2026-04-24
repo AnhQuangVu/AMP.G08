@@ -1,9 +1,10 @@
-package com.example.ampg08;
+package com.example.ampg08.activity;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.example.ampg08.R;
 import com.example.ampg08.databinding.ActivitySettingsBinding;
 
 public class SettingsActivity extends BaseActivity {

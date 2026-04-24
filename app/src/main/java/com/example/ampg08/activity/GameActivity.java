@@ -1,4 +1,4 @@
-package com.example.ampg08;
+package com.example.ampg08.activity;
 
 import android.content.Context;
 import android.content.Intent;

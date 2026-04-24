@@ -1,4 +1,4 @@
-package com.example.ampg08;
+package com.example.ampg08.activity;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.example.ampg08.R;
 import com.example.ampg08.databinding.ActivityProfileBinding;
 import com.example.ampg08.firebase.FirebaseAuthManager;
 import com.example.ampg08.firebase.FirestoreManager;

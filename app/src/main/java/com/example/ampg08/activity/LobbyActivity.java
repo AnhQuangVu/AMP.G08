@@ -1,4 +1,4 @@
-package com.example.ampg08;
+package com.example.ampg08.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,10 +12,8 @@ import com.example.ampg08.databinding.ActivityLobbyBinding;
 import com.example.ampg08.firebase.FirebaseAuthManager;
 import com.example.ampg08.firebase.FirestoreManager;
 import com.example.ampg08.model.PlayerState;
-import com.example.ampg08.model.Room;
 import com.google.firebase.firestore.ListenerRegistration;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LobbyActivity extends BaseActivity {

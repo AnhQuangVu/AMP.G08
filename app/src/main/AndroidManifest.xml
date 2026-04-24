@@ -24,7 +24,7 @@
 
         <!-- Splash -->
         <activity
-            android:name=".SplashActivity"
+            android:name=".activity.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.TiltArena">
             <intent-filter>
@@ -34,36 +34,36 @@
         </activity>
 
         <!-- Auth -->
-        <activity android:name=".LoginActivity" android:exported="false" />
-        <activity android:name=".RegisterActivity" android:exported="false" />
+        <activity android:name=".activity.LoginActivity" android:exported="false" />
+        <activity android:name=".activity.RegisterActivity" android:exported="false" />
 
         <!-- Home -->
-        <activity android:name=".HomeActivity" android:exported="false" />
-        <activity android:name=".ProfileActivity" android:exported="false" />
-        <activity android:name=".SettingsActivity" android:exported="false" />
-        <activity android:name=".LeaderboardActivity" android:exported="false" />
+        <activity android:name=".activity.HomeActivity" android:exported="false" />
+        <activity android:name=".activity.ProfileActivity" android:exported="false" />
+        <activity android:name=".activity.SettingsActivity" android:exported="false" />
+        <activity android:name=".activity.LeaderboardActivity" android:exported="false" />
 
         <!-- Room Management -->
-        <activity android:name=".CreateRoomActivity" android:exported="false" />
-        <activity android:name=".JoinRoomActivity" android:exported="false" />
-        <activity android:name=".LobbyActivity" android:exported="false" />
-        <activity android:name=".MatchmakingActivity" android:exported="false" />
+        <activity android:name=".activity.CreateRoomActivity" android:exported="false" />
+        <activity android:name=".activity.JoinRoomActivity" android:exported="false" />
+        <activity android:name=".activity.LobbyActivity" android:exported="false" />
+        <activity android:name=".activity.MatchmakingActivity" android:exported="false" />
 
         <!-- Game -->
         <activity
-            android:name=".GameActivity"
+            android:name=".activity.GameActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize"
             android:keepScreenOn="true" />
 
         <!-- Result -->
-        <activity android:name=".ResultActivity" android:exported="false" />
+        <activity android:name=".activity.ResultActivity" android:exported="false" />
 
         <!-- Legacy activities (if needed) -->
-        <activity android:name=".MainActivity" android:exported="false" />
-        <activity android:name=".PlaySetupActivity" android:exported="false" />
-        <activity android:name=".ScoreActivity" android:exported="false" />
+        <activity android:name=".activity.MainActivity" android:exported="false" />
+        <activity android:name=".activity.PlaySetupActivity" android:exported="false" />
+        <activity android:name=".activity.ScoreActivity" android:exported="false" />
 
     </application>
 

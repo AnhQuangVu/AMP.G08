@@ -1,4 +1,4 @@
-package com.example.ampg08;
+package com.example.ampg08.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.ampg08.R;
 import com.example.ampg08.adapter.MapAdapter;
 import com.example.ampg08.databinding.ActivityPlaySetupBinding;
 import com.example.ampg08.model.MapModel;

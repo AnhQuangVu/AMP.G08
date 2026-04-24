@@ -1,4 +1,4 @@
-package com.example.ampg08;
+package com.example.ampg08.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
+import com.example.ampg08.R;
 import com.example.ampg08.databinding.ActivityLoginBinding;
 import com.example.ampg08.firebase.FirebaseAuthManager;
 import com.example.ampg08.firebase.FirestoreManager;

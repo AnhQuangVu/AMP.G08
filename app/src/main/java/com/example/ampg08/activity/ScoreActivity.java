@@ -1,9 +1,10 @@
-package com.example.ampg08;
+package com.example.ampg08.activity;
 
 import android.os.Bundle;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.ampg08.R;
 import com.example.ampg08.adapter.ScoreAdapter;
 import com.example.ampg08.databinding.ActivityScoreBinding;
 import com.example.ampg08.firebase.FirebaseAuthManager;

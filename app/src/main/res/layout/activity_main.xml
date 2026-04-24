@@ -14,7 +14,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/color_background"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
     <!-- ── Animated Particle / Grid Background ── -->
     <com.example.ampg08.view.ParticleView

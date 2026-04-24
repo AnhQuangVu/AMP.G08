@@ -1,9 +1,7 @@
-package com.example.ampg08;
+package com.example.ampg08.activity;
 
 import android.os.Bundle;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
