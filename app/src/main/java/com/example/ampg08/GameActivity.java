@@ -41,6 +41,8 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
     private Dialog pauseDialog;
     private boolean keepPausedOnResume;
     private boolean proximityIsNear;
+    private boolean navigatingToResult;
+    private boolean restartingGame;
     private float sensitivityMultiplier = 1f;
     private boolean vibrationEnabled = true;
 
@@ -151,10 +153,12 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
         }
         binding.gameView.cleanup();
 
-        // --- Rời phòng trên Firestore khi thoát Activity ---
-        String uid = com.example.ampg08.firebase.FirebaseAuthManager.getInstance().getCurrentUid();
-        if (roomId != null && uid != null) {
-            com.example.ampg08.firebase.FirestoreManager.getInstance().leaveRoom(roomId, uid, null);
+        // Chi roi phong khi nguoi choi thoat game that su (khong phai qua man ket qua/recreate).
+        if (!offline && !navigatingToResult && !restartingGame) {
+            String uid = com.example.ampg08.firebase.FirebaseAuthManager.getInstance().getCurrentUid();
+            if (roomId != null && uid != null) {
+                com.example.ampg08.firebase.FirestoreManager.getInstance().leaveRoom(roomId, uid, null);
+            }
         }
     }
 
@@ -184,6 +188,7 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
     // ─── Navigation ──────────────────────────────────────────────────────
 
     private void navigateToResult(long finishTimeMs) {
+        navigatingToResult = true;
         Intent intent = new Intent(this, ResultActivity.class);
         intent.putExtra(ResultActivity.EXTRA_FINISH_TIME, finishTimeMs);
         intent.putExtra(ResultActivity.EXTRA_ROOM_ID, roomId);
@@ -214,6 +219,7 @@ public class GameActivity extends BaseActivity implements SensorEventListener {
         });
         pauseBinding.btnRestart.setOnClickListener(v -> {
             pauseDialog.dismiss();
+            restartingGame = true;
             recreate();
         });
         pauseBinding.btnSettings.setOnClickListener(v -> {

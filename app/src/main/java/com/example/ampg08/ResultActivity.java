@@ -7,13 +7,11 @@ import android.view.View;
 import com.example.ampg08.databinding.ActivityResultBinding;
 import com.example.ampg08.firebase.FirebaseAuthManager;
 import com.example.ampg08.firebase.FirestoreManager;
-import com.example.ampg08.model.Match;
 import com.example.ampg08.model.PlayerState;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ResultActivity extends BaseActivity {
@@ -33,6 +31,8 @@ public class ResultActivity extends BaseActivity {
 
     // Guard: cập nhật leaderboard chỉ 1 lần dù snapshot thay đổi nhiều lần
     private final AtomicBoolean leaderboardUpdated = new AtomicBoolean(false);
+    private final AtomicBoolean roomLeft = new AtomicBoolean(false);
+    private volatile boolean isResultWriter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +72,26 @@ public class ResultActivity extends BaseActivity {
         binding.tvSubtitle.setText("Online Match");
         binding.tvTime.setText(formatTime(myFinishTime));
 
+        String localUid = auth.getCurrentUid();
+        if (localUid != null) {
+            db.getRoomByCode(roomId, room -> {
+                isResultWriter = room != null && localUid.equals(room.getHostUid());
+                listenPlayersForResult();
+            });
+        } else {
+            listenPlayersForResult();
+        }
+
+        // Đóng room sau 15 giây (tăng từ 10s để mọi người đều thấy kết quả)
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            db.setRoomStatus(roomId, "ended", new FirestoreManager.OnCompleteCallback() {
+                @Override public void onSuccess() {}
+                @Override public void onFailure(String e) {}
+            });
+        }, 15_000);
+    }
+
+    private void listenPlayersForResult() {
         playersListener = db.listenPlayers(roomId, players -> {
             if (players == null || players.isEmpty()) return;
 
@@ -90,8 +110,8 @@ public class ResultActivity extends BaseActivity {
             PlayerState winner = sorted.get(0);
             if (winner.getFinishTime() > 0) {
                 binding.tvWinner.setText("🏆 " + winner.getDisplayName());
-                // Cập nhật leaderboard chỉ 1 lần
-                if (leaderboardUpdated.compareAndSet(false, true)) {
+                // Chi host duoc ghi ket qua, va chi ghi 1 lan.
+                if (isResultWriter && leaderboardUpdated.compareAndSet(false, true)) {
                     saveMatchResult(winner, sorted);
                 }
             } else {
@@ -111,46 +131,35 @@ public class ResultActivity extends BaseActivity {
             binding.tvRanking.setText(sb.toString().trim());
             binding.groupOnline.setVisibility(View.VISIBLE);
         });
-
-        // Đóng room sau 15 giây (tăng từ 10s để mọi người đều thấy kết quả)
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-            db.setRoomStatus(roomId, "ended", new FirestoreManager.OnCompleteCallback() {
-                @Override public void onSuccess() {}
-                @Override public void onFailure(String e) {}
-            });
-        }, 15_000);
     }
 
     private void saveMatchResult(PlayerState winner, List<PlayerState> sorted) {
-        String localUid = auth.getCurrentUid();
-        if (localUid == null) return;
+        List<PlayerState> finishedPlayers = new ArrayList<>();
+        for (PlayerState p : sorted) {
+            if (p.getFinishTime() == 0) break;
+            finishedPlayers.add(p);
+        }
 
-        // Lưu match record
-        String matchId = UUID.randomUUID().toString();
-        Match  match   = new Match(matchId, roomId, winner.getUid(),
-                winner.getDisplayName(), winner.getFinishTime());
-        db.saveMatch(match, new FirestoreManager.OnCompleteCallback() {
+        db.recordMatchAndLeaderboardOnce(roomId, winner, finishedPlayers, new FirestoreManager.OnMatchRecordedCallback() {
             @Override public void onSuccess() {}
             @Override public void onFailure(String e) {}
+            @Override public void onSkipped() {}
         });
-
-        // Cập nhật leaderboard cho tất cả người chơi đã hoàn thành
-        for (int i = 0; i < sorted.size(); i++) {
-            PlayerState p = sorted.get(i);
-            if (p.getFinishTime() == 0) break; // chưa về đích, bỏ qua
-
-            if (p.getUid().equals(winner.getUid())) {
-                db.incrementWins(p.getUid(), p.getDisplayName());
-            } else {
-                db.incrementTotalMatches(p.getUid());
-            }
-        }
     }
 
     private void goHome() {
+        leaveRoomOnce();
         startActivity(new Intent(this, HomeActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
         finish();
+    }
+
+    private void leaveRoomOnce() {
+        if (offline || roomId == null || !roomLeft.compareAndSet(false, true)) return;
+        String uid = auth.getCurrentUid();
+        if (uid != null) {
+            db.leaveRoom(roomId, uid, null);
+        }
     }
 
     private String formatTime(long ms) {
@@ -165,5 +174,6 @@ public class ResultActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (playersListener != null) playersListener.remove();
+        leaveRoomOnce();
     }
 }

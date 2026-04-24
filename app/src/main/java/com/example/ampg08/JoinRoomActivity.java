@@ -50,6 +50,14 @@ public class JoinRoomActivity extends BaseActivity {
                 return;
             }
 
+            int playerLimit = Math.max(2, room.getPlayerLimit());
+            int currentPlayers = room.getPlayers() != null ? room.getPlayers().size() : 0;
+            if (currentPlayers >= playerLimit) {
+                binding.btnJoin.setEnabled(true);
+                Toast.makeText(this, "Phòng đã đầy", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             // Thêm uid vào danh sách players
             db.joinRoom(roomId, uid, new FirestoreManager.OnCompleteCallback() {
                 @Override

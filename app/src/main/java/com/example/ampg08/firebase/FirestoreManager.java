@@ -223,21 +223,24 @@ public class FirestoreManager {
     }
 
     public void leaveRoom(String roomId, String uid, OnCompleteCallback callback) {
-        if (roomId == null || uid == null) return;
-        // 1. Remove UID from 'players' array in room document
-        db.collection(COL_ROOMS).document(roomId)
-                .update("players", com.google.firebase.firestore.FieldValue.arrayRemove(uid))
-                .addOnCompleteListener(task -> {
-                    // 2. Delete player state sub-document
-                    db.collection(COL_ROOMS).document(roomId)
-                            .collection(COL_PLAYERS).document(uid)
-                            .delete();
-                    
-                    if (callback != null) {
-                        if (task.isSuccessful()) callback.onSuccess();
-                        else callback.onFailure("Failed to leave room");
-                    }
-                });
+        if (roomId == null || uid == null) {
+            if (callback != null) callback.onFailure("Missing roomId or uid");
+            return;
+        }
+
+        DocumentReference roomRef = db.collection(COL_ROOMS).document(roomId);
+        DocumentReference playerRef = roomRef.collection(COL_PLAYERS).document(uid);
+
+        db.runTransaction((Transaction.Function<Void>) tx -> {
+            tx.update(roomRef, "players", FieldValue.arrayRemove(uid));
+            tx.delete(playerRef);
+            return null;
+        }).addOnSuccessListener(v -> {
+            if (callback != null) callback.onSuccess();
+        }).addOnFailureListener(e -> {
+            Log.e(TAG, "leaveRoom failed", e);
+            if (callback != null) callback.onFailure(e.getMessage());
+        });
     }
 
     public ListenerRegistration listenRoom(String roomId, OnRoomCallback callback) {
@@ -341,6 +344,65 @@ public class FirestoreManager {
                     Log.e(TAG, "saveMatch failed", e);
                     callback.onFailure(e.getMessage());
                 });
+    }
+
+    public void recordMatchAndLeaderboardOnce(
+            String roomId,
+            PlayerState winner,
+            List<PlayerState> finishedPlayers,
+            OnMatchRecordedCallback callback
+    ) {
+        if (roomId == null || winner == null || finishedPlayers == null || finishedPlayers.isEmpty()) {
+            callback.onFailure("Invalid match payload");
+            return;
+        }
+
+        DocumentReference matchRef = db.collection(COL_MATCHES).document(roomId);
+        db.runTransaction((Transaction.Function<Boolean>) tx -> {
+            DocumentSnapshot existing = tx.get(matchRef);
+            if (existing.exists()) {
+                return false;
+            }
+
+            long now = System.currentTimeMillis();
+            Match match = new Match(roomId, roomId, winner.getUid(), winner.getDisplayName(), winner.getFinishTime());
+            tx.set(matchRef, match);
+
+            for (PlayerState p : finishedPlayers) {
+                if (p.getUid() == null) continue;
+
+                DocumentReference lbRef = db.collection(COL_LEADERBOARD).document(p.getUid());
+                DocumentSnapshot lbSnap = tx.get(lbRef);
+
+                long currentWins = 0L;
+                long currentTotal = 0L;
+                if (lbSnap.exists()) {
+                    Long winsObj = lbSnap.getLong("wins");
+                    Long totalObj = lbSnap.getLong("totalMatches");
+                    currentWins = winsObj != null ? winsObj : 0L;
+                    currentTotal = totalObj != null ? totalObj : 0L;
+                }
+
+                long nextWins = currentWins + (p.getUid().equals(winner.getUid()) ? 1 : 0);
+                long nextTotal = currentTotal + 1;
+
+                Map<String, Object> next = new HashMap<>();
+                next.put("uid", p.getUid());
+                next.put("displayName", p.getDisplayName() != null ? p.getDisplayName() : "");
+                next.put("wins", nextWins);
+                next.put("totalMatches", nextTotal);
+                next.put("lastRoomId", roomId);
+                next.put("updatedAt", now);
+                tx.set(lbRef, next, SetOptions.merge());
+            }
+            return true;
+        }).addOnSuccessListener(created -> {
+            if (Boolean.TRUE.equals(created)) callback.onSuccess();
+            else callback.onSkipped();
+        }).addOnFailureListener(e -> {
+            Log.e(TAG, "recordMatchAndLeaderboardOnce failed", e);
+            callback.onFailure(e.getMessage());
+        });
     }
 
     // ─── LEADERBOARD ────────────────────────────────────────────────────
@@ -468,6 +530,12 @@ public class FirestoreManager {
 
     public interface OnPlayersCallback {
         void onPlayers(List<PlayerState> players);
+    }
+
+    public interface OnMatchRecordedCallback {
+        void onSuccess();
+        void onFailure(String error);
+        void onSkipped();
     }
 
     // ─── MATCHMAKING ────────────────────────────────────────────────────
